@@ -7,8 +7,8 @@ passport.use(
   new GoogleStrategy(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: GOOGLE_CLIENT_SECRET,
-      callbackURL: "/user/redirect",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: "/user/redirect", 
       session: false
     },
     (accessToken, refreshToken, profile, done) => {

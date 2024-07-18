@@ -2,6 +2,7 @@ const express = require('express')
 const app = express()
 const path = require('path')
 const dotenv = require('dotenv')
+dotenv.config()
 const nocache = require('nocache')
 const mongoose = require('mongoose')
 const adminRoute = require('./routes/admin')
@@ -9,12 +10,8 @@ const userRoute = require('./routes/user')
 const route = require('./routes/routes')
 const cookieParser = require('cookie-parser')
 const session = require('express-session')
-const cookieSession = require('cookie-session');
-
-dotenv.config()
 
 app.set('view engine', 'ejs')
-
 
 app.use(nocache())
 app.use(express.json())
@@ -33,7 +30,7 @@ app.use(session({
 
 async function serverOn() {
     try {
-        await mongoose.connect(process.env.MONGO_URI ||'mongodb://localhost:27017/Meat&Greet')
+        await mongoose.connect(process.env.MONGO_URI)
         console.log("db connected")
     }catch(error){
         console.log(`failed to start the server. ${error}`)
@@ -52,7 +49,7 @@ app.use('/user',userRoute);
 app.use('/admin',adminRoute);
 
 app.use("**", (req,res)=>{
-    res.send("Page not found");
+    res.send("Page not found Bruvh");
 });
 
 app.listen(process.env.PORT || 3000, () => {
