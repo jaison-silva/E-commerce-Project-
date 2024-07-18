@@ -1,0 +1,335 @@
+<%- include('../partials/userHeader') %>
+
+  <div class="bg-primary">
+    <div class="container py-4">
+      <!-- Breadcrumb -->
+      <nav class="d-flex">
+        <h6 class="mb-0">
+          <a href="" class="text-white-50">Home</a>
+          <span class="text-white-50 mx-2"> > </span>
+          <a href="" class="text-white-50">Library</a>
+          <span class="text-white-50 mx-2"> > </span>
+          <a href="" class="text-white"><u>Data</u></a>
+        </h6>
+      </nav>
+      <!-- Breadcrumb -->
+    </div>
+  </div>
+  <!-- Heading-->
+
+
+  <section class="py-5">
+    <div class="container">
+      <div class="row gx-5">
+        <aside class="col-lg-6">
+          <div class="border rounded-4 mb-3 d-flex justify-content-center">
+            <a data-fslightbox="mygalley" class="rounded-4" target="_blank" data-type="image"
+              href="/<%= data.images[0] %>">
+              <img style="max-width: 100%; max-height: 100vh; margin: auto;" class="rounded-4 fit"
+                src="/<%= data.images[0] %>" />
+            </a>
+          </div>
+          <div class="d-flex justify-content-center mb-3">
+            <a data-fslightbox="mygalley" class="border mx-1 rounded-2" target="_blank" data-type="image"
+              href="/<%= data.images[0] %>" class="item-thumb">
+              <img width="60" height="60" class="rounded-2" src="/<%= data.images[0] %>" />
+            </a>
+            <a data-fslightbox="mygalley" class="border mx-1 rounded-2" target="_blank" data-type="image"
+              href="/<%= data.images[1] %>" class="item-thumb">
+              <img width="60" height="60" class="rounded-2" src="/<%= data.images[1] %>" />
+            </a>
+            <a data-fslightbox="mygalley" class="border mx-1 rounded-2" target="_blank" data-type="image"
+              href="/<%= data.images[2] %>" class="item-thumb">
+              <img width="60" height="60" class="rounded-2" src="/<%= data.images[2] %>" />
+            </a>
+          </div>
+          <!-- thumbs-wrap.// -->
+          <!-- gallery-wrap .end// -->
+        </aside>
+        <main class="col-lg-6">
+          <div class="ps-lg-3">
+            <h4 class="title text-dark">
+              <%= data.name %>
+            </h4>
+            <div class="d-flex flex-row my-3">
+              <div class="text-warning mb-1 me-2">
+                <i class="fa fa-star"></i>
+                <i class="fa fa-star"></i>
+                <i class="fa fa-star"></i>
+                <i class="fa fa-star"></i>
+                <i class="fas fa-star-half-alt"></i>
+                <span class="ms-1">
+                  Rating : <%= data.rating %>
+                </span>
+              </div>
+            </div>
+            <div class="mb-3">
+              <span class="h5">Rate: <%= data.rate %></span>
+              <span class="text-muted">/per shawarma</span>
+            </div>
+
+            <p>
+              Description : <%= data.description %>
+            </p>
+
+            <div class="row">
+              <dt class="col-3">Categories :</dt>
+              <dd class="col-9">
+                <%= data.category.name %>
+              </dd>
+
+              <dt class="col-3">Type</dt>
+              <dd class="col-9">Food</dd>
+
+              <dt class="col-3">Non Veg</dt>
+              <dd class="col-9">Contains beef, chicken, pork</dd>
+
+              <dt class="col-3">Brand</dt>
+              <dd class="col-9">M&G</dd>
+            </div>
+
+            <hr />
+
+            <div class="row mb-4">
+              <div class="col-md-4 col-6">
+                <label class="mb-2">Size</label>
+                <select class="form-select border border-secondary" style="height: 35px;">
+                  <option>Small</option>
+                  <option>Medium</option>
+                  <option>Large</option>
+                </select>
+              </div>
+              <!-- col.// -->
+              <div class="col-md-4 col-6 mb-3">
+                <label class="mb-2 d-block">Quantity</label>
+                <div class="input-group mb-3" style="width: 170px;">
+                  <button class="btn btn-white border border-secondary px-3" type="button" id="button-addon1"
+                    data-mdb-ripple-color="dark">
+                    <i class="fas fa-minus"></i>
+                  </button>
+                  <input type="number" class="form-control text-center border quantity border-secondary"
+                    id="quantityInput" placeholder="1" aria-label="Example text with button addon"
+                    aria-describedby="button-addon1" min="1" max="5" value="1" disabled />
+                  <button class="btn btn-white border border-secondary px-3" type="button" id="button-addon2"
+                    data-mdb-ripple-color="dark">
+                    <i class="fas fa-plus"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <button id="wishListButton" class="btn btn-danger" onclick="addToWishList()" data-id="<%= data._id %>"> <i class="bi bi-heart"></i> Add to Wishlist </button>
+            <button class="btn btn-primary  addToCart" onclick="addToCart()" data-id="<%= data._id %>"> <i
+                class="me-1 fa fa-shopping-basket"></i> Add to cart </button>
+          </div>
+        </main>
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-light border-top py-4 justify-content-center">
+    <div class="container justify-content-center">
+      <div class="row gx-4">
+
+        <!-- Related Products  -->
+
+        <div class="col-lg-12 col-md-10">
+          <div class="px-0 border rounded-2 shadow-0">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">Similar items</h5>
+
+                <div class="row row-cols-1 row-cols-md-4 g-4">
+
+                  <!-- Each product as a column in a row -->
+                  <% similar.forEach(product=> { %>
+                    <div class="col">
+                      <div class="d-flex flex-column align-items-center">
+                        <a href="/user/productDetailed/<%= product._id %>" class="mb-3">
+                          <img src="/<%= product.images[0] %>" alt="<%= product.name %>"
+                            style="min-width: 96px; height: 96px;" class="img-md img-thumbnail" />
+                        </a>
+                        <div class="info text-center">
+                          <a href="#" class="nav-link mb-1">
+                            <%= product.name %> <br />
+                              <%= product.description %>
+                          </a>
+                          <strong class="text-dark"> Rs. <%= product.rate %></strong>
+                        </div>
+                      </div>
+                    </div>
+                    <% }); %>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+  </section>
+
+  <!-- pokki adi -->
+
+  <div class="container my-5">
+    <div class="row">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 ">
+        <i class="bi bi-bag-check " style="font-size: 60px;"></i>
+        <h6>Free Delivery</h6>
+        <p>Please note that free delivery is only for orders above a specific amount.</p>
+      </div>
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 ">
+        <i class="bi bi-credit-card" style="font-size: 60px;"></i>
+        <h6>100% Secure Payment</h6>
+        <p>Please note that free delivery is only for orders above a specific amount.</p>
+      </div>
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 ">
+        <i class="bi bi-tag" style="font-size: 60px;"></i>
+        <h6>Daily Offer</h6>
+        <p>Please note that free delivery is only for orders above a specific amount.</p>
+      </div>
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 ">
+        <i class="bi bi-star-fill" style="font-size: 60px;"></i>
+        <h6>Quality Guarantee</h6>
+        <p>Please note that free delivery is only for orders above a specific amount.</p>
+      </div>
+    </div>
+  </div>
+
+  <%- include('../partials/footer') %>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"></script>
+    <script>
+      const tabs = document.querySelectorAll('.nav-link');
+      tabs.forEach((tab, index) => {
+        tab.addEventListener('click', () => {
+          tabs.forEach(tab => tab.classList.remove('active'));
+          tab.classList.add('active');
+
+          const tabContents = document.querySelectorAll('.tab-pane');
+          tabContents.forEach(content => content.classList.remove('show', 'active'));
+          tabContents[index].classList.add('show', 'active');
+        });
+      });
+
+
+      async function addToCart() {
+        try {
+          const button = document.querySelector(".addToCart");
+          const quantity = document.querySelector('.quantity').value;
+          const productId = button.getAttribute('data-id');
+          const response = await fetch(`/user/addToCart?qty=${quantity}`, {
+            method: "POST", headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ id: productId })
+          })
+
+          const data = await response.json();
+
+          if (data.message === "success") {
+            Swal.fire({
+              icon: 'success',
+              title: 'Product Added!',
+              text: 'The product has been added to your cart.'
+            });
+          } else if (data.message === "excess") {
+            Swal.fire({
+              icon: 'Only 5 quantity allowed, 5 quantity is in cart',
+              title: 'Quantity Limit Reached',
+              text: 'You have reached the maximum quantity for this product.'
+            });
+          } else {
+            // Handle other potential error messages from the server
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: data.message || 'An error occurred while adding the product to your cart.'
+            });
+          }
+        } catch (error) {
+          console.error('Fetch Error:', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'An error occurred while processing your request.'
+          })
+        }
+      }
+
+
+      async function addToWishList (){
+        const button = document.getElementById('wishListButton')
+        const productId = button.getAttribute('data-id')
+        
+        const response = await fetch('/user/addToWishList',{
+          method : "POST",
+          headers : {
+            "Content-Type" : "application/json"
+          },
+          body : JSON.stringify({productId})
+        })
+
+        const result =  await response.json()
+
+        if(result.message == "added"){
+          Swal.fire({
+              icon: 'success',
+              title: 'Product Added!',
+              text: 'The product has been added to your Wishlist.'
+            });
+        }else if(result.message == "exists"){
+          Swal.fire({
+              icon: 'warning',
+              title: 'Product already Exists!',
+              text: 'The product has been added to your Wishlist already.'
+            });
+        }
+      }
+
+
+      document.addEventListener("DOMContentLoaded", function () {
+        const minusButton = document.getElementById('button-addon1');
+        const plusButton = document.getElementById('button-addon2');
+        const quantityInput = document.getElementById('quantityInput');
+
+        // Function to handle quantity change
+        function updateQuantity(change) {
+          let currentQuantity = parseInt(quantityInput.value);
+          if (isNaN(currentQuantity)) {
+            currentQuantity = 1;
+          }
+
+          const newQuantity = currentQuantity + change;
+          if (newQuantity >= 1 && newQuantity <= 5) {
+            quantityInput.value = newQuantity;
+          }
+        }
+
+        // Event listeners for buttons
+        minusButton.addEventListener('click', function () {
+          updateQuantity(-1);
+        });
+
+        plusButton.addEventListener('click', function () {
+          updateQuantity(1);
+        });
+
+        // Ensure the value is within range when manually inputting
+        quantityInput.addEventListener('input', function () {
+          let currentQuantity = parseInt(quantityInput.value);
+          if (currentQuantity < 1) {
+            quantityInput.value = 1;
+          } else if (currentQuantity > 5) {
+            quantityInput.value = 5;
+          }
+        });
+      });
+
+      
+
+    </script>
+
+    </body>
+
+    </html>

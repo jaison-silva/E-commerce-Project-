@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmation</title>
+    <!-- Include Bootstrap CSS or your preferred CSS framework -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Include your custom CSS if any -->
+    <style>
+        /* Custom styles can be added here */
+    </style>
+</head>
+<body>
+
+    <!-- Admin Header Partial -->
+    <%- include('../partials/adminHeader') %> 
+
+    <!-- Heading -->
+    <div class="bg-primary">
+        <div class="container py-4">
+            <!-- Breadcrumb -->
+            <nav class="d-flex">
+                <h6 class="mb-0">
+                    <a href="" class="text-white-50">Home</a>
+                    <span class="text-white-50 mx-2"> > </span>
+                    <a href="" class="text-white">Order Confirmation</a>
+                </h6>
+            </nav>
+            <!-- Breadcrumb -->
+        </div>
+    </div>
+
+    <section class="bg-light py-5">
+        <div class="container justify-content-center d-flex">
+                <div class="col-xl-8 col-lg-8 mb-4">
+
+                    <!-- Confirmation Message -->
+                    <div class="card shadow-0 border">
+                        <div class="p-4">
+                            <h5 class="card-title mb-3">Order Confirmation</h5>
+                            <div class="alert alert-success" role="alert">
+                                <h4 class="alert-heading">Order Placed Successfully!</h4>
+                                <p>Your order has been placed successfully. Thank you for shopping with us!</p>
+                                <hr>
+                                <p class="mb-0">You will receive an email confirmation shortly.</p>
+                            </div>
+                            <div class="text-center mt-4">
+                                <a href="/" class="btn btn-primary">Continue Shopping</a>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Confirmation Message -->
+                </div>
+        </div>
+    </section>
+
+    <!-- Footer Partial -->
+    <%- include('../partials/footer') %>
+
+    <!-- Bootstrap JS and other scripts if needed -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,227 @@
+<%- include('../../partials/userHeader') %>
+
+    <head>
+        <style>
+            .gradient-custom {
+                /* fallback for old browsers */
+                background: #f6d365;
+
+                /* Chrome 10-25, Safari 5.1-6 */
+                background: -webkit-linear-gradient(to right bottom, rgba(246, 211, 101, 1), rgba(253, 160, 133, 1));
+
+                /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+                background: linear-gradient(to right bottom, rgba(246, 211, 101, 1), rgba(253, 160, 133, 1))
+            }
+
+            h6 {
+                margin-top: 50px;
+            }
+        </style>
+    </head>
+
+    <div class="bg-primary">
+        <div class="container py-4">
+            <!-- Breadcrumb -->
+            <nav class="d-flex">
+                <h5 class="mb-0">
+                    <a href="" class="text-white-50">Home</a>
+                    <span class="text-white-50 mx-2"> > </span>
+                    <a href="" class="text-white-50">Profile</a>
+                </h5>
+            </nav>
+            <!-- Breadcrumb -->
+        </div>
+    </div>
+
+    <section class="pt-3 shadow-lg"> <!-- Added shadow-lg class for a larger shadow -->
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3 px-3">
+                    <div class="account-nav rounded shadow bg-white p-4">
+                        <div class="text-center mb-4">
+                            <h4 class="mb-0">Welcome <%= user.name %>
+                            </h4>
+                            <p class="text-muted">Your personal dashboard</p>
+                        </div>
+                        <div class="text-center my-3">
+                            <a class="nav-link" href="/cart">
+                                <i class="fa-solid fa-wallet me-1"></i>Wallet Amount: <%= user.wallet%>
+                            </a>
+                        </div>
+                        <hr>
+                        <ul class="list-unstyled mb-0">
+                            <li>
+                                <a href="/user/profile" class="text-decoration-none text-primary d-block py-2 "><button
+                                        class="btn btn-primary w-100">Profile</button></a>
+                            </li>
+                            <li>
+                                <a href="/user/address" class="text-decoration-none text-dark d-block py-2"><button
+                                        class="btn btn-secondary w-100">Address</button></a>
+                            </li>
+                            <li>
+                                <a href="/user/orders" class="text-decoration-none text-dark d-block py-2"><button
+                                        class="btn btn-secondary w-100">My Orders</button></a>
+                            </li>
+                            <li>
+                                <a href="/wishlisted" class="text-decoration-none text-dark d-block py-2"><button
+                                        class="btn btn-secondary w-100">My Wishlist</button></a>
+                            </li>
+                            <li>
+                                <a href="/wallethistory" class="text-decoration-none text-dark d-block py-2"><button
+                                        class="btn btn-secondary w-100">Wallet History</button></a>
+                            </li>
+                            <li>
+                                <a href="/user/forgot" class="text-decoration-none text-dark d-block py-2"><button
+                                        class="btn btn-secondary w-100">Change Password</button></a>
+                            </li>
+                        </ul>
+                        <hr>
+                        <div class="text-center">
+                            <a href="/user/logout" class="text-decoration-none text-dark d-block py-2"><button
+                                    class="btn btn-danger w-100">Logout</button></a>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div class="col-lg-9 px-3">
+                    <div class="col col-lg-12 mb-4 mb-lg-0">
+                        <div class="card mb-3" style="border-radius: .5rem;">
+                            <div class="row g-0 w-100">
+                                <div class="col-md-4 gradient-custom text-center text-white"
+                                    style="border-top-left-radius: .5rem; border-bottom-left-radius: .5rem;">
+                                    <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp"
+                                        alt="Avatar" class="img-fluid my-5" style="width: 150px;" />
+                                    <h5 id="userName">
+                                        <%= user.name %>
+                                    </h5>
+                                    <p>
+                                        <%= user.email %>
+                                    </p>
+                                    <i class="far fa-edit mb-5" id="nameEditButton" style="cursor: pointer;"></i>
+                                    <div id="editNameContainer" style="display: none;">
+                                        <input type="text" id="nameInput" value="<%= user.name %>"
+                                            class="form-control" />
+                                        <button id="updateNameButton" class="btn btn-success my-2">Update</button>
+                                    </div>
+                                </div>
+                                <div class="col-md-8 ">
+                                    <div class="card-body p-4">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <h6>Information</h6>
+                                            <button class="btn btn-warning"> Edit Profile</button>
+                                        </div>
+                                        <hr class="mt-0 mb-4">
+                                        <div class="row pt-1">
+                                            <div class="col-6 mb-3">
+                                                <h6>Email</h6>
+                                                <p class="text-muted">
+                                                    <%= user.email %>
+                                                </p>
+                                            </div>
+                                            <div class="col-6 mb-3">
+                                                <h6>Password</h6>
+                                                <p class="text-muted">
+                                                    <% if(user.password) {user.password}else{ %> Google Signed In <% }
+                                                            %>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <h6>Account created on : <%= user.dateCreated.toLocaleString() %>
+                                        </h6>
+                                        <hr class="mt-0 mb-4">
+                                        <div class="row pt-1">
+                                            <div class="col-6 mb-3">
+                                                <h6>Recent</h6>
+                                                <p class="text-muted">Lorem ipsum</p>
+                                            </div>
+                                            <div class="col-6 mb-3">
+                                                <h6>Most Viewed</h6>
+                                                <p class="text-muted">Dolor sit amet</p>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex justify-content-start">
+                                            <a href="#!"><i class="fab fa-facebook-f fa-lg me-3"></i></a>
+                                            <a href="#!"><i class="fab fa-twitter fa-lg me-3"></i></a>
+                                            <a href="#!"><i class="fab fa-instagram fa-lg"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+    </section>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const nameEditButton = document.getElementById('nameEditButton');
+            const userName = document.getElementById('userName');
+            const editNameContainer = document.getElementById('editNameContainer');
+            const nameInput = document.getElementById('nameInput');
+            const updateNameButton = document.getElementById('updateNameButton');
+
+            nameEditButton.addEventListener('click', () => {
+                userName.style.display = 'none';
+                editNameContainer.style.display = 'block';
+                nameInput.value = userName.innerText.trim(); // Set the input value to the current name
+            });
+
+            updateNameButton.addEventListener('click', async () => {
+                const newName = nameInput.value;
+
+                try {
+                    const response = await fetch('/user/updateProfile', {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ name: newName })
+                    });
+                    if (response.ok) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: 'Name updated successfully!',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    }
+                } catch (error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'An error occurred. Please try again later.',
+                    });
+                };
+            });
+        });
+
+
+    </script>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const message = urlParams.get('msg'); // Change 'message' to 'msg'
+        if (typeof message !== 'undefined') {
+            if (message.includes('noPass')) {
+                Swal.fire({
+                    title: "Failure",
+                    text: "The user is logged in through Google Auth, hence no Password",
+                    icon: "error",
+                    confirmButtonText: 'OK'
+                });
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        }
+    </script>
+
+
+    <%- include('../../partials/footer') %>

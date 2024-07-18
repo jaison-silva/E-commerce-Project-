@@ -1,0 +1,280 @@
+<%- include('../partials/userHeader') %>
+
+
+    <div class="bg-primary">
+        <div class="container py-4">
+            <!-- Breadcrumb -->
+            <nav class="d-flex">
+                <h5 class="mb-0">
+                    <a href="/user/index" class="text-white-50">Home</a>
+                    <span class="text-white-50 mx-2"> > </span>
+                    <a href="" class="text-white-50">Cart</a>
+                </h5>
+            </nav>
+            <!-- Breadcrumb -->
+        </div>
+    </div>
+
+    <div class="container-fluid py-5 d-flex justify-content-center gradient-custom">
+
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header py-3">
+                    <h4>Cart Items - <% if(cart && cart.products.length>0) {cart.products.length} else{ %> 0 <% } %>
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <% if(!cart || cart.products.length==0) { %>
+                        <div class="row justify-content-center">
+                            <div class="col-md-8">
+                                <h2 class="text-center m-5">Your cart is Empty</h2>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="col-md-12">
+                                <div class="card mb-4">
+                                    <div class="card-header py-3">
+                                        <h5 class="mb-0">Summary</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <ul class="list-group list-group-flush">
+                                            <li
+                                                class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 pb-0">
+                                                product
+                                                <span>$00.00</span>
+                                            </li>
+                                            <li
+                                                class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                                Shipping
+                                                <span>Not Yet</span>
+                                            </li>
+                                            <li
+                                                class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 mb-3">
+                                                <div>
+                                                    <strong>Total amount</strong>
+                                                    <strong>
+                                                        <p class="mb-0">(including VAT)</p>
+                                                    </strong>
+                                                </div>
+                                                <span><strong>$00.00</strong></span>
+                                            </li>
+                                        </ul>
+
+                                        <button type="button" data-mdb-button-init data-mdb-ripple-init
+                                            class="btn btn-primary btn-lg btn-block " disabled>
+                                            Go to checkout
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <% } else { %>
+                            <% cart.products.forEach(product=> { %>
+                                <!-- Single item -->
+                                <div class="row my-5">
+                                    <div class="col-lg-3 col-md-12 mb-4 mb-lg-0">
+                                        <!-- Image -->
+                                        <div class="bg-image hover-overlay hover-zoom ripple rounded"
+                                            data-mdb-ripple-color="light">
+                                            <img src="/<%= product.productId.images[0] %>" class="w-100"
+                                                alt="Blue Jeans Jacket" />
+                                            <a href="#!">
+                                                <div class="mask" style="background-color: rgba(251, 251, 251, 0.2)">
+                                                </div>
+                                            </a>
+                                        </div>
+                                        <!-- Image -->
+                                    </div>
+
+                                    <div class="col-lg-5 col-md-6 mb-4 mb-lg-0">
+                                        <!-- Data -->
+                                        <p><strong>
+                                                <%= product.productId.name %>
+                                            </strong></p>
+                                        <p>Info: <%= product.productId.description %>
+                                        </p>
+                                        <p>Rating: <%= product.productId.rating %>
+                                        </p>
+                                        <p>Availability: <%= product.productId.listing %>
+                                        </p>
+                                        <p>Category: <%= product.productId.category.name %>
+                                        </p>
+                                        <p class="m-3 p-3 d-flex justify-content-center">
+                                            <button type="button" id="delete" value="<%= product.productId._id %>" data-mdb-button-init data-mdb-ripple-init
+                                                class="btn btn-primary btn-sm me-1 mb-2 w-50" data-mdb-tooltip-init
+                                                title="Remove item">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                            <button type="button" data-mdb-button-init data-mdb-ripple-init
+                                                class="btn btn-danger btn-sm mb-2 w-50" data-mdb-tooltip-init
+                                                title="Move to the wish list">
+                                                <i class="fas fa-heart"></i>
+                                            </button>
+                                        </p>
+                                        <!-- Data -->
+                                    </div>
+
+                                    <div class="col-lg-4 col-md-6 mb-4 mb-lg-0 justify-content-center p-3">
+                                        <!-- Quantity -->
+                                        <div class="d-flex mb-4" style="max-width: 300px">
+                                            <label class="form-label m-2 justify-content-between"
+                                                for="form1-<%= product.productId._id %>">Quantity</label>
+
+                                            <button class="btn btn-primary px-3"
+                                                onclick="updateQuantity('decrement', '<%= product.productId._id %>')">
+                                                <i class="fas fa-minus"></i>
+                                            </button>
+
+                                            <div class="form-outline">
+                                                <input id="form1-<%= product.productId._id %>" min="1" max="5"
+                                                    name="quantity" value="<%= product.quantity %>" type="number"
+                                                    class="form-control" style="text-align: center;" disabled />
+                                            </div>
+
+                                            <button class="btn btn-primary px-3 ms-2"
+                                                onclick="updateQuantity('increment', '<%= product.productId._id %>')">
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                                        </div>
+
+                                        <script>
+                                            function updateQuantity(action, productId) {
+                                                fetch('/user/updateQuantity', {
+                                                    method: 'POST',
+                                                    headers: {
+                                                        'Content-Type': 'application/json'
+                                                    },
+                                                    body: JSON.stringify({ action, productId })
+                                                })
+                                                    .then(response => response.json())
+                                                    .then(data => {
+                                                        if (data.success) {
+                                                            const quantityInput = document.getElementById('form1-' + productId);
+                                                            quantityInput.value = data.newQuantity;
+                                                            window.location.reload();
+                                                        } else {
+                                                            Swal.fire({
+                                                                icon: 'error',
+                                                                title: 'Limit Exceeded',
+                                                                text: data.message
+                                                            });
+                                                        }
+                                                    })
+                                                    .catch(error => console.error('Error:', error));
+                                            }
+                                        </script>
+                                        <!-- Quantity -->
+
+                                        <!-- Price -->
+                                        <p class="text-start text-md-center">
+                                            <strong>$ Cost in total - <%= (product.productId.rate)*(product.quantity) %>
+                                            </strong>
+                                        </p>
+                                        <p class="text-start text-md-center">
+                                            <strong>$ Cost per piece - <%= (product.productId.rate)%></strong>
+                                        </p>
+                                        <!-- Price -->
+                                    </div>
+                                </div>
+                                <!-- Single item -->
+                                <% }); %>
+                </div>
+            </div>
+            <div class="card mb-4">
+                <div class="card-body">
+                    <p><strong>Expected shipping delivery</strong></p>
+                    <p class="mb-0">12.10.2020 - 14.10.2020</p>
+                </div>
+            </div>
+            <div class="card mb-4 mb-lg-0">
+                <div class="card-body">
+                    <p><strong>We accept</strong></p>
+                    <img class="me-2" width="45px"
+                        src="https://mdbcdn.b-cdn.net/wp-content/plugins/woocommerce-gateway-stripe/assets/images/visa.svg"
+                        alt="Visa" />
+                    <img class="me-2" width="45px"
+                        src="https://mdbcdn.b-cdn.net/wp-content/plugins/woocommerce-gateway-stripe/assets/images/amex.svg"
+                        alt="American Express" />
+                    <img class="me-2" width="45px"
+                        src="https://mdbcdn.b-cdn.net/wp-content/plugins/woocommerce-gateway-stripe/assets/images/mastercard.svg"
+                        alt="Mastercard" />
+                    <img class="me-2" width="45px"
+                        src="https://mdbcdn.b-cdn.net/wp-content/plugins/woocommerce/includes/gateways/paypal/assets/images/paypal.webp"
+                        alt="PayPal acceptance mark" />
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header py-3">
+                    <h5 class="mb-0">Summary</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li
+                            class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 pb-0">
+                            Products
+                            <span>$<%= totalAmount %></span>
+                        </li><br>
+                        <li
+                            class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 mb-3">
+                            <div>
+                                <strong>Total amount</strong>
+                            </div>
+                            <span><strong>$<%= totalAmount %></strong></span>
+                        </li>
+                    </ul>
+
+                    <a href="/user/checkout"><button type="button" data-mdb-button-init data-mdb-ripple-init
+                        class="btn btn-primary btn-lg btn-block">
+                        Go to checkout
+                    </button></a>
+                </div>
+            </div>
+            <% } %>
+        </div>
+
+    </div>
+
+    </div>
+    </div>
+
+    <script>
+        document.getElementById('delete').addEventListener('click', async () => {
+            const id = document.getElementById('delete').value;
+
+            try {
+                const response = await fetch(`/user/deleteProduct/${id}`, {
+                    method: "DELETE"
+                });
+
+                if (response.ok) {
+                    Swal.fire({
+                        title: 'Success!',
+                        text: 'Product successfully deleted.',
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        window.location.href = '/user/viewCart';
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Failed to delete product.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            } catch (e) {
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'An error occurred while deleting the product.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+                console.log(e);
+            }
+        });
+    </script>
+
+    <%- include('../partials/footer') %>
