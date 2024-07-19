@@ -49,7 +49,7 @@ exports.api_login = async (req, res) => {
         if (user.password === password) {
             const token = { email: email };
             const userToken = jwt.sign(token, "secret_key", {
-                expiresIn: '4h'
+                expiresIn: '10s'
             });
 
             res.cookie('userJwtAuth', userToken, {
@@ -191,7 +191,7 @@ exports.registerUser = async (req, res) => {
         }
 
         const userToken = jwt.sign(token, "secret_key", {
-            expiresIn: '4h'
+            expiresIn: '10s'
         });
 
         res.cookie('userJwtAuth', userToken, {

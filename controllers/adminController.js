@@ -50,7 +50,7 @@ exports.login = async (req, res) => {
 
             // Create a JWT token
             const token = { email: email };
-            const adminToken = jwt.sign(token, "secret_key", { expiresIn: '4h' });
+            const adminToken = jwt.sign(token, "secret_key", { expiresIn: '5m' });
 
             // Set the JWT as a cookie
             res.cookie('adminJwtAuth', adminToken, {

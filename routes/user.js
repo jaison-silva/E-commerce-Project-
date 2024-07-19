@@ -81,5 +81,7 @@ route.get('/checkout',userDataGetter,checkUserStatus, cartController.renderCheck
 route.get('/orderPlaced',userDataGetter,checkUserStatus, cartController.orderPlaced)
 route.post('/placeOrder',userDataGetter,checkUserStatus,controller.placeOrder);
 
+//Wallet History Routes
+route.get('/walletHistory',userDataGetter,checkUserStatus, profileController.walletHistory)
 
 module.exports = route

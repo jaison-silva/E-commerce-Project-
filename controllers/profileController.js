@@ -3,6 +3,7 @@ const Product = require('../models/productModel')
 const userModel = require('../models/userModel')
 const orderModel = require('../models/orderModel')
 const addressModel = require('../models/addressModel')
+const walletHistoryModel = require('../models/walletHistoryModel')
 const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken')
 
@@ -254,4 +255,20 @@ exports.updateProfile = async (req, res) => {
         res.status(500).json({ message: "fail" })
     }
 
+}
+
+exports.walletHistory = async (req, res) => {
+    try {
+        const response = await walletHistoryModel.findOne({ userId: req.user._id });
+
+        if (!response || response.length === 0) {
+            res.render('user/profile/walletHistory', { response: false });
+        } else {
+            res.render('user/profile/walletHistory', { response: response });
+        }
+    } catch (error) {
+        // Handle error (optional)
+        console.error('Error fetching wallet history:', error);
+        res.status(500).send('Internal Server Error');
+    }
 }
