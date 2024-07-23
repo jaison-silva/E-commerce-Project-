@@ -11,6 +11,14 @@ route.get('/logout', controller.logout);
 
 route.get('/users', controller.manageUsers)
 
+//offers route
+route.get('/offers', controller.offers)
+route.post('/updateOffers', controller.updateOffers)
+route.get('/deleteOffer/:id', controller.deleteOffer)
+
+//coupons route
+route.get('/coupon', controller.coupon)
+
 route.get('/products', controller.adminProducts);
 route.get('/category', controller.adminCategory)
 

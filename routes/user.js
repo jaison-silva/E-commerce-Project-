@@ -10,6 +10,7 @@ const controller = require('../controllers/userController')
 const profileController = require('../controllers/profileController')
 const wishlistControler = require('../controllers/wishlistControler')
 const cartController = require('../controllers/cartController')
+const reportController = require('../controllers/reportController')
 
 
 route.get('/login', controller.loginPage)
@@ -35,6 +36,9 @@ route.delete('/deleteAddress/:id',userDataGetter,checkUserStatus, profileControl
 route.delete('/deleteProduct/:id',userDataGetter,checkUserStatus, cartController.deleteProduct)
 
 // route.delete('/editAddress/:id', profileController.editAddress)
+
+//invoice donwload
+route.get('/invoice',reportController.generateInvoice)
 
 // Profile routess
  

@@ -195,3 +195,109 @@ async function getYearlySales() {
 
     return dailySalesData;
 }
+
+
+// invoice generator 
+
+
+exports.generateInvoice = async (req, res) => {
+    try {
+      const orderId = req.params._id;
+      const order = await Orderdb.findById(orderId).populate('items.productId shippingAddress');
+  
+      if (!order) {
+        return res.status(404).json({ message: 'Order not found' });
+      }
+
+      if (order.status!=="Delivered") {
+        return res.status(404).json({ message: 'Order not delivered' });
+      }  
+
+  
+    //   const filteredItems = order.orderedItems.filter(item =>
+    //     item.status === 'Delivered' && item.status !== 'Returned' && item.status !== 'Cancelled'
+    //   );
+  
+      const doc = new PDFDocument();
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', 'attachment; filename=   M&G_invoice.pdf');
+      doc.pipe(res);
+  
+      // Header Section
+      doc.image('../assets/img/WhatsApp Image 2024-07-23 at 11.10.42_a42bb17f.jpg', { width: 50, align: 'right' }).moveDown(0.5);
+      doc.fontSize(20).text('Meat & Greet', { align: 'center' });
+      doc.moveDown(0.5);
+      doc.fontSize(16).text('Invoice', { align: 'center' });
+      doc.moveDown();
+  
+      // Company Information
+      doc.fontSize(12).text('Address: 123 Studio Lane, City, State, ZIP');
+      doc.text('Phone: (+91) 456-7890');
+      doc.text('Email: meatandgreet@gmail.com');
+      doc.text('Website: www.meatandgreet.com');
+      doc.moveDown();
+  
+      // Invoice Details
+      doc.fontSize(12).text(`Invoice Number: ${generateInvoiceNumber(order)}`);
+      doc.text(`Invoice Date: ${formatDate(order.orderedDate)}`);
+      doc.moveDown();
+  
+      // Customer Information
+      doc.fontSize(14).text('Customer Information:', { underline: true });
+      doc.fontSize(12).text(`Name: ${order.name}`);
+      doc.text(`Shipping Address: ${order.shippingAddress.address},${order.shippingAddress.district},${order.shippingAddress.state}`);
+      doc.text(` ${order.shippingAddress.mobileNumber}`);
+      doc.text(` ${order.shippingAddress.pincode}`);
+      doc.moveDown();
+  
+      // Ordered Items Table
+      generateTable(doc, product);
+      doc.moveDown();
+  
+      // Payment Information
+      doc.fontSize(12).text(`Payment Method: ${order.paymentMethod}`);
+      doc.text(`Payment Status: ${order.paymentStatus}`);
+      if (order.couponApplied) {
+        doc.text(`Coupon: (-)$${order.couponApplied.discountAmount}/-`, { align: 'right' });
+      }
+      doc.text(`Total Amount: $${order.totalAmount}/-`, { align: 'right' });
+      doc.moveDown();
+  
+      // Footer Section
+      doc.fontSize(10).text('Thank you for your purchase!', { align: 'center' });
+      doc.text('For any inquiries, please contact us at meatandgreet@gmail.com or (+91) 456-7890.', { align: 'center' });
+      doc.text('Return Policy: Items can be returned within 30 days of receipt. Please visit our website for more details.', { align: 'center' });
+  
+      doc.end();
+  
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  };
+  
+  function generateTable(doc, orderedItems) {
+    const tableHeaders = ['Product Name', 'Description', 'Quantity', 'Unit Price', 'Total'];
+    const tableData = orderedItems.items.map(item => [
+      item.name,
+      item.description,
+      item.quantity,
+      `$${item.rate}/-`,
+      `$${item.price * item.quantity}/-`
+    ]);
+  
+    doc.table({
+      headers: tableHeaders,
+      rows: tableData
+    });
+  }
+  
+  function generateInvoiceNumber(order) {
+    // Generate a unique invoice number based on order details
+    return `INV-${order._id}`;
+  }
+  
+  function formatDate(date) {
+    // Format date in a readable format
+    return new Date(date).toLocaleDateString();
+  }

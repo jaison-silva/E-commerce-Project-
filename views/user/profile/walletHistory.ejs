@@ -108,7 +108,7 @@
                                     <div class="tab-content mb-5">
                                         <div class="tab-pane active ms-4" id="nav-returned" role="tabpanel"
                                             aria-labelledby="nav-returned-tab">
-                                            <% if(respose===false)+{ %>
+                                            <% if(response===false){ %>
                                                 <div class="col-md-12 mb-3">
                                                     <div class="card shadow">
                                                         <div
@@ -150,8 +150,17 @@
                                                                         </span>
                                                                     </div>
                                                                     <div class="d-flex">
-                                                                        <span class="m-1 font-weight-bold">Type : <%=
+                                                                        <% if( order.type == "credit"){ %>
+                                                                        <span class="m-1 font-weight-bold text-success">Type : <%=
                                                                                 order.type %></span>
+                                                                                <% }else{ %>
+                                                                                    <span class="m-1 font-weight-bold text-danger">Type : <%=
+                                                                                order.type %></span>
+                                                                                    <% } %>
+                                                                    </div>
+                                                                    <div class="d-flex">
+                                                                        <span class="m-1 font-weight-bold">Wallet Balance : <%=
+                                                                                order.walletBalance %></span>
                                                                     </div>
                                                                     <!-- Add more order details here -->
                                                                 </div>

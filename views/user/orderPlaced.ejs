@@ -47,6 +47,7 @@
                             </div>
                             <div class="text-center mt-4">
                                 <a href="/" class="btn btn-primary">Continue Shopping</a>
+                                <button class="btn btn-success" onclick=donwnloadInvoice()>Download Invoice</button>
                             </div>
                         </div>
                     </div>
@@ -60,5 +61,10 @@
 
     <!-- Bootstrap JS and other scripts if needed -->
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function donwnloadInvoice(){
+            axios.get(`/user/invoice`) // to add the order Id
+        }
+    </script>
 </body>
 </html>

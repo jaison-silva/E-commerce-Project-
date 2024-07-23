@@ -9,7 +9,7 @@ exports.viewWishlist = async (req, res) => {
         res.render('user/wishList', { wishList: data, user: true })
     } catch (e) {
         console.log(e)
-    }
+    } 
 }
 
 exports.addToWishList = async (req, res) => {

@@ -4,6 +4,7 @@ const userModel = require('../models/userModel')
 const orderModel = require('../models/orderModel')
 const cartModel = require('../models/cartModel')
 const addressModel = require('../models/addressModel')
+const walletHistoryModel = require('../models/walletHistoryModel')
 const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
 const { mongoose } = require('mongoose');
@@ -49,7 +50,7 @@ exports.api_login = async (req, res) => {
         if (user.password === password) {
             const token = { email: email };
             const userToken = jwt.sign(token, "secret_key", {
-                expiresIn: '10s'
+                expiresIn: '15m'
             });
 
             res.cookie('userJwtAuth', userToken, {
@@ -191,7 +192,7 @@ exports.registerUser = async (req, res) => {
         }
 
         const userToken = jwt.sign(token, "secret_key", {
-            expiresIn: '10s'
+            expiresIn: ''
         });
 
         res.cookie('userJwtAuth', userToken, {
@@ -299,14 +300,23 @@ exports.placeOrder = async (req, res) => {
 
         if (PaymentMethod == "M&G Wallet") {
             console.log("walet debit triggereds")
+
             const updatedUser = await userModel.findOneAndUpdate(
                 { email: decoded.email },
                 { $inc: { wallet: -totalAmount } },
                 { new: true }
             );
 
-            if (!updatedUser) {
-                throw new Error("Failed to update wallet balance");
+            console.log(updatedUser + " this is the return from the wallet balance update")
+
+            const walletUpdate = await walletHistoryModel.findOneAndUpdate(
+                {userId: req.user._id},
+                { $push: { history: { amount: totalAmount, type: 'debit', walletBalance : updatedUser.wallet } } },
+                { new: true, upsert: true }
+            )
+
+            if (!updatedUser || !walletUpdate) {
+                throw new Error("Failed to update wallet balance" + updatedUser + walletUpdate);
             }
             console.log("Wallet updated successfully:", updatedUser);
         }

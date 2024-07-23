@@ -75,6 +75,8 @@
                                                 data-mdb-tooltip-init title="Remove item">
                                                 <i class="fas fa-trash"></i>
                                             </button>
+                                            <button class="btn btn-primary  addToCart" onclick="addToCart()" data-id="<%= product.productId._id %>"> <i
+                                                class="me-1 fa fa-shopping-basket"></i> Add to cart </button>
                                         </p>
                                         <!-- Data -->
                                     </div>
@@ -124,6 +126,54 @@
             }
 
         }
+
+
+        async function addToCart() {
+        try {
+          const button = document.querySelector(".addToCart");
+        //   const quantity = document.querySelector('.quantity').value;
+          const quantity = 1
+          const productId = button.getAttribute('data-id');
+          const response = await fetch(`/user/addToCart?qty=${quantity}`, {
+            method: "POST", headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ id: productId })
+          })
+
+          const data = await response.json();
+
+          if (data.message === "success") {
+            Swal.fire({
+              icon: 'success',
+              title: 'Product Added!',
+              text: 'The product has been added to your cart.'
+            });
+            remove()
+          } else if (data.message === "excess") {
+            Swal.fire({
+              icon: 'Only 5 quantity allowed, 5 quantity is in cart',
+              title: 'Quantity Limit Reached',
+              text: 'You have reached the maximum quantity for this product.'
+            });
+          } else {
+            // Handle other potential error messages from the server
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: data.message || 'An error occurred while adding the product to your cart.'
+            });
+          }
+        } catch (error) {
+          console.error('Fetch Error:', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'An error occurred while processing your request.'
+          })
+        }
+      }
+
     </script>
 
     <%- include('../partials/footer') %>

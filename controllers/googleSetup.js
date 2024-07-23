@@ -67,7 +67,7 @@ exports.googleRedirect = [
 
     // Generate JWT token for user
     const token = jwt.sign({ email: req.user.email }, "secret_key", {
-      expiresIn: "10s",
+      expiresIn: "15m",
     });
 
     // Set token as cookie

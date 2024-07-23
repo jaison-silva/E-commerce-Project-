@@ -50,14 +50,14 @@ exports.addToCart = async (req, res) => {
         const user = await userModel.findOne({ email: decoded.email });
         const productId = req.body.id;
         let quantity = parseInt(req.query.qty);
-        console.log("Trriggere" + quantity)
+        // console.log("Trriggere" + quantity)
 
         let cart = await cartModel.findOne({ user: user._id });
 
         // 3. If Cart Doesn't Exist, Create One
         if (!cart) {
             cart = new cartModel({
-                user: user._id,
+                user: user._id, 
                 products: [{
                     productId,
                     quantity
