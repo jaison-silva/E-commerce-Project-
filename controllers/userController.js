@@ -331,12 +331,12 @@ exports.placeOrder = async (req, res) => {
             paymentStatus
         });
 
-        await order.save();
+        const newOrderData = await order.save();
 
         // Delete the cart
         await cartModel.findByIdAndDelete(cartId);
 
-        res.render('user/orderPlaced', { user: true })
+        return res.render('user/orderPlaced', { user: true , orderDate : newOrderData._id})
     } catch (e) {
         console.log(e);
         res.status(500).send("Erorr")

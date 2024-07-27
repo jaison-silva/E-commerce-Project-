@@ -2,6 +2,8 @@ const Category = require('../models/categoryModel')
 const Product = require('../models/productModel')
 const userModel = require('../models/userModel')
 const orderModel = require('../models/orderModel')
+const couponModel = require('../models/couponModel')
+const joi = require('joi')
 const adminModel = require('../models/adminModel')
 const jwt = require('jsonwebtoken')
 const multer = require('multer');
@@ -397,13 +399,13 @@ exports.updateOffers = async (req, res) => {
         })
 
     } else {
-        const allProducts = await Product.find({ category : elementId })
+        const allProducts = await Product.find({ category: elementId })
 
         if (!allProducts) {
             return res.json({ msg: "No products in this category" })
         }
 
-        const offerAppliedToCategory = allProducts.map( async (product) => {
+        const offerAppliedToCategory = allProducts.map(async (product) => {
             const data = await Product.findById(product._id)
             // console.log(data + " this is the data")
             const currentRate = data.rate
@@ -424,21 +426,66 @@ exports.updateOffers = async (req, res) => {
     }
 }
 
-    exports.deleteOffer = async (req,res)=>{
-        const id = req.params.id
-        const data = await Product.findById(id)
+exports.deleteOffer = async (req, res) => {
+    const id = req.params.id
+    const data = await Product.findById(id)
 
-        await Product.findByIdAndUpdate(id, {
-            rate : data.rateTemp,
-            rateTemp : 0,
-            offerApplied : false,
-            offerPercentage : 0
-        })
-        .then(()=>{
+    await Product.findByIdAndUpdate(id, {
+        rate: data.rateTemp,
+        rateTemp: 0,
+        offerApplied: false,
+        offerPercentage: 0
+    })
+        .then(() => {
             return res.redirect('/admin/offers?msg=success')
         })
-    }
+}
 
-    exports.coupon = async (req,res) =>{
-        
+exports.coupon = async (req, res) => {
+    const coupon = await couponModel.find()
+    let data =  coupon.map( async (element) => {
+        if(element.isExpired()){
+            element.isActive = "Expired"
+            await element.save()
+        }
+        return element
+    });
+
+    data = await Promise.all(data)
+
+    res.render('admin/coupon', { coupon : data })
+}
+
+exports.addCoupon = async (req, res) => {
+    
+    console.log(req.body)
+
+    const schema = joi.object({
+        code: joi.string().alphanum().min(3).max(30).required(),
+        discountPercentage: joi.number().min(0).max(100).required(),
+        minimumPurchaseAmount: joi.number().min(0).required(),
+        expiryDate: joi.date().iso().greater('now').required()
+    });
+
+    const {error , value } = schema.validate(req.body)
+    if (error) {
+        console.log('Validation error:', error.details);
+        return res.status(400).json({ error: error.details[0].message });
     }
+    const { code, discountPercentage, minimumPurchaseAmount, expiryDate } = value
+
+    const date = new couponModel({
+        code,
+        discountPercentage,
+        minimumPurchaseAmount,
+        expiryDate
+    })
+
+    try {
+        await date.save();
+        console.log('Coupon created successfully');
+        res.status(200)
+    } catch (error) {
+        console.log('Error creating coupon:', error);
+    }
+}

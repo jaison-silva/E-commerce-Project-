@@ -1,0 +1,153 @@
+<%- include('../partials/adminHeader') %>
+
+    <!-- main -->
+
+    <main class="container mt-5">
+        <div class="row">
+            <div class="col-md-3 mb-5 border border-rounded border-left-0">
+                <div class="card-header justify-content-center d-flex">
+                    <h3 class="mt-3">Welcome Admin</h3>
+                </div>
+                <hr class="w-100 my-1 bg-secondary" style="height: 3px;">
+                <ul class="nav nav-pills flex-column">
+                    <li class="nav-item mt-2">
+                        <a class="nav-link" href="/">Dashboard</a>
+                    </li>
+                    <li class="nav-item mt-2">
+                        <a class="nav-link" href="/admin/category">Category</a>
+                    </li>
+                    <li class="nav-item mt-2">
+                        <a class="nav-link" href="/admin/products">Products</a>
+                    </li>
+                    <li class="nav-item mt-2">
+                        <a class="nav-link" href="/admin/users">Manage Users</a>
+                    </li>
+                    <li class="nav-item mt-2">
+                        <a class="nav-link active" href="/admin/coupon">Coupons</a>
+                    </li>
+                    <li class="nav-item mt-2">
+                        <a class="nav-link" href="/admin/offers">Offers</a>
+                    </li>
+                    <li class="nav-item mt-2">
+                        <a class="nav-link" href="/admin/manageOrders">Orders</a>
+                    </li>
+                    <li class="nav-item mt-2 mt-2">
+                        <a class="nav-link border border-danger bg-danger text-white text-center"
+                            href="/admin/logout">Logout</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="col-md-9">
+                <div class="card m-4">
+                    <div class="card-header justify-content-center d-flex">
+                        <h4>Add New Coupon</h4>
+                    </div>
+                    <div class="card-body">
+                        <form id="addCouponForm">
+                            <div class="mb-3">
+                                <label for="couponName" class="form-label">Coupon Code</label>
+                                <input type="text" class="form-control" id="couponCode" name="couponCode" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="minimumPurchaseAmount" class="form-label">Minimum Rate</label>
+                                <input type="number" class="form-control" id="minimumPurchaseAmount"
+                                    name="minimumPurchaseAmount" min="0" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="discountPercentage" class="form-label">Discount Percentage</label>
+                                <input type="number" class="form-control" id="discountPercentage"
+                                    name="discountPercentage" min="0" max="99" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="expiry" class="form-label">Expiry Date</label>
+                                <input type="date" class="form-control" id="expiry" name="expiry" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Add Coupon</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card mx-5">
+                    <div class="card-header">
+                        <h2>Existing Coupons</h2>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-striped" id="couponsTable">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Coupon Name</th>
+                                    <th scope="col">Minimum Rate</th>
+                                    <th scope="col">Discount Percentage</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if(coupon.length==0){ %>
+                                    <tr>
+                                        <td colspan="5" class="text-center">No existing coupons at the moment.</td>
+                                      </tr>
+                                    <% }else{ %>
+                                        <% coupon.forEach(row=> { %>
+                                            <tr>
+                                                <th scope="col">
+                                                    <%= row.code %>
+                                                </th>
+                                                <th scope="col">
+                                                    <%= row.minimumPurchaseAmount %>
+                                                </th>
+                                                <th scope="col">
+                                                    <%= row.discountPercentage %>
+                                                </th>
+                                                <th scope="col"><button><a
+                                                            href="/admin/activeCoupon/<%= row._id %>"></a></button></th>
+                                                <th scope="col"><button><a
+                                                            href="/admin/deleteCoupon/<%= row._id %>"></button>
+                                                </th>
+                                            </tr>
+
+                                            <% })}; %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+
+    <script>
+        document.getElementById('addCouponForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
+
+            const couponCode = document.getElementById('couponCode').value;
+            const minimumPurchaseAmount = document.getElementById('minimumPurchaseAmount').value;
+            const discountPercentage = document.getElementById('discountPercentage').value;
+            const expiryDate = document.getElementById('expiry').value
+
+            try {
+                const response = await axios.post('/admin/addCoupon', {
+                    code : couponCode,
+                    discountPercentage,
+                    minimumPurchaseAmount,
+                    expiryDate
+                });
+
+                if (response.status === 200) {
+                    // alert('Coupon added successfully!');
+
+                    window.location.reload();
+                } else {
+                    throw new Error('Failed to add coupon');
+                }
+            } catch (error) {
+                console.log('Error adding coupon:', error);
+                alert('Failed to add coupon. + ' + error);
+            }
+        });
+    </script>
+
+    <%- include('../partials/footer') %>

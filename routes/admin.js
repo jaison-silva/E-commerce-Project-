@@ -6,7 +6,7 @@ const upload = require('../controllers/multer');
 const multer = require('multer')
 
 route.get('/', controller.dashBoard);
-route.post('/login', controller.login);
+route.post('/login', controller.login); 
 route.get('/logout', controller.logout);
 
 route.get('/users', controller.manageUsers)
@@ -18,6 +18,7 @@ route.get('/deleteOffer/:id', controller.deleteOffer)
 
 //coupons route
 route.get('/coupon', controller.coupon)
+route.post('/addCoupon', controller.addCoupon)
 
 route.get('/products', controller.adminProducts);
 route.get('/category', controller.adminCategory)

@@ -38,7 +38,7 @@ route.delete('/deleteProduct/:id',userDataGetter,checkUserStatus, cartController
 // route.delete('/editAddress/:id', profileController.editAddress)
 
 //invoice donwload
-route.get('/invoice',reportController.generateInvoice)
+route.get('/invoice/:id',reportController.generateInvoice)
 
 // Profile routess
  

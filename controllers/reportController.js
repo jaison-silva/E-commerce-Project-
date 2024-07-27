@@ -202,9 +202,9 @@ async function getYearlySales() {
 
 exports.generateInvoice = async (req, res) => {
     try {
-      const orderId = req.params._id;
+      const orderId = req.params.id;
       const order = await Orderdb.findById(orderId).populate('items.productId shippingAddress');
-  
+      // console.log(orderId + order)
       if (!order) {
         return res.status(404).json({ message: 'Order not found' });
       }
@@ -224,7 +224,7 @@ exports.generateInvoice = async (req, res) => {
       doc.pipe(res);
   
       // Header Section
-      doc.image('../assets/img/WhatsApp Image 2024-07-23 at 11.10.42_a42bb17f.jpg', { width: 50, align: 'right' }).moveDown(0.5);
+      doc.image('assets/img/logo.jpg', { width: 50, align: 'right' }).moveDown(0.5);
       doc.fontSize(20).text('Meat & Greet', { align: 'center' });
       doc.moveDown(0.5);
       doc.fontSize(16).text('Invoice', { align: 'center' });
@@ -251,7 +251,7 @@ exports.generateInvoice = async (req, res) => {
       doc.moveDown();
   
       // Ordered Items Table
-      generateTable(doc, product);
+      generateTable(doc, order);
       doc.moveDown();
   
       // Payment Information
@@ -279,10 +279,10 @@ exports.generateInvoice = async (req, res) => {
   function generateTable(doc, orderedItems) {
     const tableHeaders = ['Product Name', 'Description', 'Quantity', 'Unit Price', 'Total'];
     const tableData = orderedItems.items.map(item => [
-      item.name,
-      item.description,
+      item.productId.name,
+      item.productId.description,
       item.quantity,
-      `$${item.rate}/-`,
+      `$${item.productId.rate}/-`,
       `$${item.price * item.quantity}/-`
     ]);
   

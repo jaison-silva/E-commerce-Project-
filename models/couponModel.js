@@ -6,18 +6,19 @@ const couponSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
-    discountAmount: {
+    discountPercentage: {
         type: Number,
-        required: true
+        required: true 
     },
     minimumPurchaseAmount: {
         type: Number, 
         required: true
     },
     isActive: {
-        type: Boolean,
+        type: String,
+        enum : ["Active","Expired","InActive"],
         required: true,
-        default: true,
+        default: "Active",
     },
     expiryDate :{
         type: Date,
@@ -25,6 +26,10 @@ const couponSchema = new mongoose.Schema({
     }
 });
 
-const CouponDb = mongoose.model('coupon', couponSchema);
+couponSchema.methods.isExpired = function() {
+    return new Date() > this.expiryDate;
+};
 
-module.exports = CouponDb;
+const couponModel = mongoose.model('coupon', couponSchema);
+
+module.exports = couponModel;
