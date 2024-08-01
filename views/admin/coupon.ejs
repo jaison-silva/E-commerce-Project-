@@ -80,14 +80,14 @@
                                     <th scope="col">Minimum Rate</th>
                                     <th scope="col">Discount Percentage</th>
                                     <th scope="col">Status</th>
-                                    <th scope="col">Actions</th>
+                                    <th scope="col" class="d-flex justify-content-center">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <% if(coupon.length==0){ %>
                                     <tr>
                                         <td colspan="5" class="text-center">No existing coupons at the moment.</td>
-                                      </tr>
+                                    </tr>
                                     <% }else{ %>
                                         <% coupon.forEach(row=> { %>
                                             <tr>
@@ -100,10 +100,19 @@
                                                 <th scope="col">
                                                     <%= row.discountPercentage %>
                                                 </th>
-                                                <th scope="col"><button><a
-                                                            href="/admin/activeCoupon/<%= row._id %>"></a></button></th>
-                                                <th scope="col"><button><a
-                                                            href="/admin/deleteCoupon/<%= row._id %>"></button>
+                                                <th scope="col">
+                                                    <span
+                                                        class="<%= row.isActive === 'Active' ? 'text-success' : (row.isActive === 'Expired' ? 'text-danger' : 'text-warning') %>">
+                                                        <%= row.isActive %>
+                                                    </span>
+                                                </th>
+                                                <th scope="col" class="justify-content-center d-flex"><button
+                                                        onclick="deleteCoupon('<%=row._id %>'
+                                                        )"><i class="bi bi-trash icon"
+                                                            style="margin-right: 10px"></i></button>
+                                                    <button onclick="changeStatus('<%=row._id %>')"><i
+                                                            class="bi bi-toggles2"></i>
+                                                        </i></button>
                                                 </th>
                                             </tr>
 
@@ -117,7 +126,7 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         document.getElementById('addCouponForm').addEventListener('submit', async function (event) {
@@ -130,16 +139,21 @@
 
             try {
                 const response = await axios.post('/admin/addCoupon', {
-                    code : couponCode,
+                    code: couponCode,
                     discountPercentage,
                     minimumPurchaseAmount,
                     expiryDate
                 });
 
                 if (response.status === 200) {
-                    // alert('Coupon added successfully!');
-
-                    window.location.reload();
+                    Swal.fire({
+                        title: 'Success!',
+                        text: 'Coupon added successfully!',
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        window.location.reload();
+                    });
                 } else {
                     throw new Error('Failed to add coupon');
                 }
@@ -148,6 +162,59 @@
                 alert('Failed to add coupon. + ' + error);
             }
         });
+
+        async function deleteCoupon(id) {
+            try {
+                axios.delete(`/admin/deleteCoupon/${id}`)
+                    .then((response) => {
+                        if (response.status == 200) {
+                            Swal.fire({
+                                title: 'Success!',
+                                text: 'Coupon deleted successfully!',
+                                icon: 'info',
+                                confirmButtonText: 'OK'
+                            }).then(() => {
+                                window.location.reload();
+                            });
+                        }
+                    })
+            } catch (error) {
+                console.log(error)
+            }
+        }
+
+        async function changeStatus(id) {
+    try {
+        const response = await axios.get(`/admin/changeCouponStatus/${id}`);
+        
+        if (response.data.success) {
+            Swal.fire({
+                title: 'Success!',
+                text: 'Coupon status changed!',
+                icon: 'info',
+                confirmButtonText: 'OK'
+            }).then(() => {
+                window.location.reload();
+            });
+        } else if (response.data.error) {
+            Swal.fire({
+                title: 'Info!',
+                text: "Cannot change the status of an expired Coupon",
+                icon: 'info',
+                confirmButtonText: 'OK'
+            });
+        }
+    } catch (error) {
+        console.error('Error changing status:', error);
+        Swal.fire({
+            title: 'Error!',
+            text: 'An error occurred while changing the coupon status.',
+            icon: 'error',
+            confirmButtonText: 'OK'
+        });
+    }
+}
+
     </script>
 
     <%- include('../partials/footer') %>

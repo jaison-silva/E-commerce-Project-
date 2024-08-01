@@ -34,7 +34,8 @@
         <div class="col-md-12 d-flex justify-content-between align-items-center mt-5">
           <h3 class="mx-5">Products</h3>
           <div class="btn">
-            <button class="btn btn-secondary mx-5"><a class="nav-link" href="/admin/addproducts">Add Products</a></button>
+            <button class="btn btn-secondary mx-5"><a class="nav-link" href="/admin/addproducts">Add
+                Products</a></button>
           </div>
         </div>
 
@@ -45,13 +46,13 @@
                 <th>Name</th>
                 <th>Category</th>
                 <th>Listing </th>
-                <th>Action</th>
+                <th class="d-flex justify-content-center">Action</th>
               </tr>
             </thead>
             <tbody>
               <% data.forEach(product=> { %>
-              <tr>
-                <td>
+                <tr>
+                  <td>
                     <div class="d-flex align-items-center">
                       <img src="/<%= product.images[0] %>" alt="" style="width: 45px; height: 45px"
                         class="rounded-circle" />
@@ -61,20 +62,26 @@
                         </p>
                       </div>
                     </div>
-                </td>
-                <td>
-                  <span class="badge badge-success rounded-pill d-inline text-dark">
-                    <%= product.category.name %>
-                  </span>
-                </td>
-                <td class="display-6">
-                  <%if(product.listing){%> <i class="bi bi-toggle2-on text-success"></i><%}else{%> <i class="bi bi-toggle2-off text-danger"></i> <%}%>
-                </td>
-                <td><a href="/admin/editProduct/<%= product._id %>"><button class="btn btn-primary"><i class="fas fa-pencil-alt"></i></button></a>&nbsp;
-                  <button class="btn btn-primary delete-btn" data-id="<%= product._id %>"><i class="fas fa-trash-alt"></i></button>
-                </td>
-              </tr>
-              <% }) %>
+                  </td>
+                  <td>
+                    <span class="badge badge-success rounded-pill d-inline text-dark">
+                      <%= product.category.name %>
+                    </span>
+                  </td>
+                  <td class="display-6">
+                    <%if(product.listing){%> <i class="bi bi-toggle2-on text-success"></i>
+                      <%}else{%> <i class="bi bi-toggle2-off text-danger"></i>
+                        <%}%>
+                  </td>
+                  <td class="d-flex justify-content-center">
+                    <a href="/admin/editProduct/<%= product._id %>"><button
+                        class="btn btn-primary"><i class="fas fa-pencil-alt"></i></button></a>&nbsp;
+                    <button class="btn btn-primary delete-btn" data-id="<%= product._id %>"><i
+                        class="fas fa-trash-alt"></i></button>&nbsp;
+                        <a href="/admin/listProduct/<%= product._id %>"><button class="btn btn-primary"><i class="bi bi-toggles2"></i></button></a>
+                  </td>
+                </tr>
+                <% }) %>
             </tbody>
           </table>
         </div>
@@ -84,96 +91,103 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-        // Add click event listener to all delete buttons
-        document.querySelectorAll('.delete-btn').forEach(button => {
-            button.addEventListener('click', async function () {
-                const productId = this.getAttribute('data-id');
+      // Add click event listener to all delete buttons
+      document.querySelectorAll('.delete-btn').forEach(button => {
+        button.addEventListener('click', async function () {
+          const productId = this.getAttribute('data-id');
 
-                // Show confirmation alert
-                const result = await Swal.fire({
-                    title: 'Are you sure?',
-                    text: "You won't be able to revert this!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes, delete it!'
-                });
+          // Show confirmation alert
+          const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+          });
 
-                if (result.isConfirmed) {
-                    try {
-                        // Send fetch request to delete the product
-                        const response = await fetch(`/admin/product/${productId}`, {
-                            method: 'DELETE',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            }
-                        });
-
-                        const data = await response.json();
-
-                        if (response.ok) {
-                            // Show success message
-                            await Swal.fire(
-                                'Deleted!',
-                                data.message,
-                                'success'
-                        ).then(()=>{
-                          location.reload();
-                        })
-                        } else {
-                            // Show error message
-                            Swal.fire(
-                                'Error!',
-                                data.message || 'An error occurred while deleting the product.',
-                                'error'
-                            );
-                        }
-                    } catch (error) {
-                        // Show error message
-                        Swal.fire(
-                            'Error!',
-                            'An error occurred while deleting the product.',
-                            'error'
-                        );
-                    }
+          if (result.isConfirmed) {
+            try {
+              // Send fetch request to delete the product
+              const response = await fetch(`/admin/product/${productId}`, {
+                method: 'DELETE',
+                headers: {
+                  'Content-Type': 'application/json'
                 }
-            });
+              });
+
+              const data = await response.json();
+
+              if (response.ok) {
+                // Show success message
+                await Swal.fire(
+                  'Deleted!',
+                  data.message,
+                  'success'
+                ).then(() => {
+                  location.reload();
+                })
+              } else {
+                // Show error message
+                Swal.fire(
+                  'Error!',
+                  data.message || 'An error occurred while deleting the product.',
+                  'error'
+                );
+              }
+            } catch (error) {
+              // Show error message
+              Swal.fire(
+                'Error!',
+                'An error occurred while deleting the product.',
+                'error'
+              );
+            }
+          }
         });
+      });
     });
-</script>
+  </script>
 
   <script>
     const urlParams = new URLSearchParams(window.location.search);
     const message = urlParams.get('msg'); // Change 'message' to 'msg'
     if (typeof message !== 'undefined') {
-        if (message.includes('added')) {
-            Swal.fire({
-                icon: "success",
-                title: "Product added Successfully!",
-                showConfirmButton: true
-            });
-            window.history.replaceState({}, document.title, window.location.pathname);
-        } else if (message.includes('password')) {
-            Swal.fire({
-                title: "Failure",
-                text: "Wrong password!",
-                icon: "error",
-                confirmButtonText: 'OK'
-            });
-            window.history.replaceState({}, document.title, window.location.pathname);
-        } else if (message.includes('loggedout')) {
-            Swal.fire({
-                position: "middle",
-                icon: "warning",
-                title: "Logged Out!",
-                showConfirmButton: false,
-                timer: 1500
-            });
-            window.history.replaceState({}, document.title, window.location.pathname);
-        } 
+      if (message.includes('added')) {
+        Swal.fire({
+          icon: "success",
+          title: "Product added Successfully!",
+          showConfirmButton: true
+        });
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }if (message.includes('listingToggled')) {
+        Swal.fire({
+          icon: "success",
+          title: "Product has been toggled!",
+          showConfirmButton: true
+        });
+        window.history.replaceState({}, document.title, window.location.pathname);
+      } else if (message.includes('password')) {
+        Swal.fire({
+          title: "Failure",
+          text: "Wrong password!",
+          icon: "error",
+          confirmButtonText: 'OK'
+        });
+        window.history.replaceState({}, document.title, window.location.pathname);
+      } else if (message.includes('loggedout')) {
+        Swal.fire({
+          position: "middle",
+          icon: "warning",
+          title: "Logged Out!",
+          showConfirmButton: false,
+          timer: 1500
+        });
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
     }
-</script>
+  </script>
 
 
 

@@ -1,8 +1,11 @@
 const userModel = require('../models/userModel');
 const jwt = require('jsonwebtoken');
+const categoryModel = require('../models/categoryModel');
+// const { category } = require('./userController');
 
 exports.index = async (req, res) => {
     try {
+        const category = await categoryModel.find()
         // Check if req.cookies exists and then check for userJwtAuth and adminJwtAuth cookies
         if (req.cookies && req.cookies.userJwtAuth) {
 
@@ -19,10 +22,10 @@ exports.index = async (req, res) => {
                 } else {
                     console.log(decoded.email + " this is the email from the token");
                     const user = await userModel.findOne({ email: decoded.email });
-                    console.log(user + " this is the user");
+                    // console.log(user + " this is the user");
 
                     if (user && user.status) {
-                        res.render('user/index', { user: true });
+                        res.render('user/index', { user: true , category });
                     } else {
                         res.clearCookie("userJwtAuth");
                         return res.redirect('/user/login?msg=userBlocked');
@@ -33,7 +36,7 @@ exports.index = async (req, res) => {
         } else if (req.cookies && req.cookies.adminJwtAuth) {
             res.redirect('/admin');
         } else {
-            res.render('user/index', { user: false });
+            res.render('user/index', {category, user: false });
         }
     } catch (e) {
         console.log(e);

@@ -19,8 +19,11 @@ route.get('/deleteOffer/:id', controller.deleteOffer)
 //coupons route
 route.get('/coupon', controller.coupon)
 route.post('/addCoupon', controller.addCoupon)
+route.delete('/deleteCoupon/:id', controller.deleteCoupon)
+route.get('/changeCouponStatus/:id', controller.changeCouponStatus)
 
 route.get('/products', controller.adminProducts);
+route.get('/listProduct/:id', controller.listProduct);
 route.get('/category', controller.adminCategory)
 
 route.get('/addcategory', controller.addcategory)

@@ -2,6 +2,7 @@ const Category = require('../models/categoryModel')
 const Product = require('../models/productModel')
 const userModel = require('../models/userModel')
 const orderModel = require('../models/orderModel')
+const cartModel = require('../models/cartModel')
 const couponModel = require('../models/couponModel')
 const joi = require('joi')
 const adminModel = require('../models/adminModel')
@@ -16,22 +17,86 @@ exports.adminLogin = (req, res) => {
 exports.dashBoard = async (req, res) => {
     try {
         if (req.cookies && req.cookies.adminJwtAuth) {
-            const response = await orderModel.find()
-            if (!response) {
-                console.log("error getting order data")
+            // Fetch orders with populated product details
+            const orders = await orderModel.find({ status: 'Delivered' }).populate('items.productId');
+            
+            if (!orders) {
+                console.log("Error getting order data");
+                return;
             }
-            const overallSales = response.length
-            const overallAmount = response.reduce((acc, val) => {
-                console.log("Accumulating totalAmount. Current acc:", acc, "Current val.totalAmount:", val.totalAmount);
-                return acc + val.totalAmount;
-            }, 0);
-            res.render('admin/admin', { overallSales, overallAmount });
+
+            // Aggregate product quantities
+            const productQuantities = {};
+
+            orders.forEach(order => {
+                order.items.forEach(item => {
+                    if (productQuantities[item.productId._id]) {
+                        productQuantities[item.productId._id].quantity += item.quantity;
+                    } else {
+                        productQuantities[item.productId._id] = {
+                            name: item.productId.name,
+                            quantity: item.quantity,
+                            rate: item.price,
+                            category: item.productId.category
+                        };
+                    }
+                });
+            });
+
+            // Convert to array and sort by quantity
+            const sortedProducts = Object.entries(productQuantities)
+                .map(([id, product]) => ({ id, ...product }))
+                .sort((a, b) => b.quantity - a.quantity)
+                .slice(0, 5);
+
+            // Aggregate category sales
+            const categorySales = {};
+
+            orders.forEach(order => {
+                order.items.forEach(item => {
+                    const categoryId = item.productId.category;
+                    if (categorySales[categoryId]) {
+                        categorySales[categoryId] += item.price * item.quantity;
+                    } else {
+                        categorySales[categoryId] = item.price * item.quantity;
+                    }
+                });
+            });
+
+            // Convert to array and sort by sales amount
+            const sortedCategories = Object.entries(categorySales)
+                .map(([id, sales]) => ({ id, sales }))
+                .sort((a, b) => b.sales - a.sales);
+
+            // Fetch category names
+            const categoryIds = sortedCategories.map(cat => cat.id);
+            const categories = await Category.find({ _id: { $in: categoryIds } });
+
+            // Map category names to sales
+            const topCategories = sortedCategories.map(cat => {
+                const category = categories.find(c => c._id.toString() === cat.id.toString());
+                return { name: category ? category.name : 'Unknown', sales: cat.sales };
+            });
+
+            const overallSales = orders.length;
+            const overallAmount = orders.reduce((acc, val) => acc + val.totalAmount, 0);
+
+            // Include number of products sold in top products
+            const topProductsWithCount = sortedProducts.map(product => {
+                return {
+                    name: product.name,
+                    quantitySold: product.quantity,
+                    rate: product.rate
+                };
+            });
+
+            res.render('admin/admin', { overallSales, overallAmount, topProducts: topProductsWithCount, topCategories });
         }
     } catch (error) {
-
+        console.error("Error in dashboard:", error);
+        res.status(500).send("Server Error");
     }
-}
-
+};
 exports.login = async (req, res) => {
     try {
         let { email, password } = req.body;
@@ -111,7 +176,7 @@ exports.toggleUser = async (req, res) => {
     try {
         // Find user by userId (replace this with your actual logic)
         const user = await userModel.findById(userId);
-        console.log(user)
+        // console.log(user)
 
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
@@ -443,8 +508,8 @@ exports.deleteOffer = async (req, res) => {
 
 exports.coupon = async (req, res) => {
     const coupon = await couponModel.find()
-    let data =  coupon.map( async (element) => {
-        if(element.isExpired()){
+    let data = coupon.map(async (element) => {
+        if (element.isExpired()) {
             element.isActive = "Expired"
             await element.save()
         }
@@ -453,11 +518,11 @@ exports.coupon = async (req, res) => {
 
     data = await Promise.all(data)
 
-    res.render('admin/coupon', { coupon : data })
+    res.render('admin/coupon', { coupon: data })
 }
 
 exports.addCoupon = async (req, res) => {
-    
+
     console.log(req.body)
 
     const schema = joi.object({
@@ -467,7 +532,7 @@ exports.addCoupon = async (req, res) => {
         expiryDate: joi.date().iso().greater('now').required()
     });
 
-    const {error , value } = schema.validate(req.body)
+    const { error, value } = schema.validate(req.body)
     if (error) {
         console.log('Validation error:', error.details);
         return res.status(400).json({ error: error.details[0].message });
@@ -484,8 +549,77 @@ exports.addCoupon = async (req, res) => {
     try {
         await date.save();
         console.log('Coupon created successfully');
-        res.status(200)
+        return res.status(200).json({ message: 'Coupon created successfully' });
     } catch (error) {
         console.log('Error creating coupon:', error);
     }
 }
+
+exports.deleteCoupon = async (req, res) => {
+    try {
+        const couponId = req.params.id;
+        await couponModel.findByIdAndDelete(couponId);
+        console.log('Coupon deleted successfully');
+        return res.status(200).redirect('/admin/coupon')
+    } catch (error) {
+        console.log('Error deleting coupon:', error);
+        return res.status(500).json({ error: 'Failed to delete coupon' });
+    }
+};
+
+exports.changeCouponStatus = async (req, res) => {
+
+    try {
+        const id = req.params.id
+
+        const couponStatus = await couponModel.findById(id);
+
+        if (!couponStatus) {
+            return res.status(404).json({ error: 'Coupon not found' });
+        }
+
+        let newStatus;
+
+        if (couponStatus.isActive === 'Active') { 
+            newStatus = 'InActive';
+            couponStatus.isActive = newStatus;
+            await couponStatus.save();
+            return res.status(200).json({ success: 'change status of coupon' });
+        } else if (couponStatus.isActive === 'InActive') {
+            newStatus = 'Active';
+            couponStatus.isActive = newStatus;
+            await couponStatus.save();
+            return res.status(200).json({ error: 'change status of coupon' });
+        } else if (couponStatus.isActive === 'Expired') {
+            return res.status(200).json({ error: 'Cannot change status of an expired coupon' });
+        }
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+
+exports.listProduct = async (req, res) => {
+    const id = req.params.id;
+
+    await Product.findById(id)
+        .then(async (data) => {
+            if (data.listing) {
+                data.listing = false;
+                await cartModel.updateMany(
+                    { 'products.productId': id }, 
+                    { $pull: { products: { productId: id } } }
+                );
+            } else {
+                data.listing = true;
+            }
+            return data.save();  // Save the updated product data
+        })
+        .then(() => {
+            res.redirect('/admin/products?msg=listingToggled');
+        })
+        .catch((error) => {
+            console.error('Error toggling listing:', error);
+            res.redirect('/admin/product?msg=toggleFailed');
+        });
+};

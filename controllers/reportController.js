@@ -86,6 +86,18 @@ async function generatePDFReport(res, reportTitle, salesData, dailySalesData) {
     }
 }
 
+async function generateTable(doc, headers, data, totalSalesSum, totalOrderAmountSum, totalDiscountSum, totalCouponDiscountSum) {
+  const tableData = [...data, ['Total:', totalSalesSum, 'Rs.' + totalOrderAmountSum, 'Rs.' + totalDiscountSum, 'Rs.' + totalCouponDiscountSum]];
+
+  doc.table({
+      headers: headers,
+      rows: tableData,
+      widths: Array(headers.length).fill('*'), // Equal width for all columns
+      heights: 20,
+      headerRows: 1
+  });
+}
+
 function calculateTotalSums(dailySalesData) {
     let totalSalesSum = 0;
     let totalOrderAmountSum = 0;
@@ -171,7 +183,7 @@ async function getYearlySales() {
 
         order.items.forEach(item => {
             totalSales += item.quantity;
-            const productPrice = item.productId.rate * item.quantity;
+            // const productPrice = item.productId.rate * item.quantity;
             // const discountedPrice = productPrice * (1 - (item.productId.discount / 100));
             // const discountAmount = productPrice - discountedPrice;
             // totalDiscount += Math.round(discountAmount);
@@ -204,7 +216,7 @@ exports.generateInvoice = async (req, res) => {
     try {
       const orderId = req.params.id;
       const order = await Orderdb.findById(orderId).populate('items.productId shippingAddress');
-      // console.log(orderId + order)
+      console.log( order)
       if (!order) {
         return res.status(404).json({ message: 'Order not found' });
       }
@@ -251,7 +263,7 @@ exports.generateInvoice = async (req, res) => {
       doc.moveDown();
   
       // Ordered Items Table
-      generateTable(doc, order);
+      generateTble(doc, order);
       doc.moveDown();
   
       // Payment Information
@@ -276,8 +288,9 @@ exports.generateInvoice = async (req, res) => {
     }
   };
   
-  function generateTable(doc, orderedItems) {
+  function generateTble(doc, orderedItems) {
     const tableHeaders = ['Product Name', 'Description', 'Quantity', 'Unit Price', 'Total'];
+    console.log(orderedItems);
     const tableData = orderedItems.items.map(item => [
       item.productId.name,
       item.productId.description,
