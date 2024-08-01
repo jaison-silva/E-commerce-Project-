@@ -4,6 +4,7 @@ const productModel = require('../models/productModel')
 const jwt = require('jsonwebtoken')
 const cart = require('../models/cartModel')
 const addressModel = require('../models/addressModel')
+const couponModel = require('../models/couponModel')
 
 exports.viewCart = async (req, res) => {
     try {
@@ -18,13 +19,14 @@ exports.viewCart = async (req, res) => {
             return res.send("user not found")
         }
 
-        const cart = await cartModel.findOne({ user: user._id })
-            .populate('products.productId').populate({
-                path: 'products.productId',
-                populate: {
-                    path: 'category'
-                }
-            });
+        const cart = await cartModel.findOne({ user: user._id, })
+        .populate({
+            path: 'products.productId', // First populate the productId
+            populate: {
+                path: 'category', // Then populate the category inside the productId
+            }
+        });
+            console.log("FFFFFFF",cart)
 
         let totalAmount = 0;
 
@@ -50,14 +52,14 @@ exports.addToCart = async (req, res) => {
         const user = await userModel.findOne({ email: decoded.email });
         const productId = req.body.id;
         let quantity = parseInt(req.query.qty);
-        console.log("Trriggere" + quantity)
+        // console.log("Trriggere" + quantity)
 
         let cart = await cartModel.findOne({ user: user._id });
 
         // 3. If Cart Doesn't Exist, Create One
         if (!cart) {
             cart = new cartModel({
-                user: user._id,
+                user: user._id, 
                 products: [{
                     productId,
                     quantity
@@ -164,22 +166,62 @@ exports.renderCheckout = async (req, res) => {
 
         const address = await addressModel.find({ user: user._id })
 
+        const coupon = await couponModel.find()
+        coupon.map(async (element) => {
+            if (element.isExpired()) {
+                element.isActive = "Expired"
+                await element.save()
+            }
+        });
+
+        const coupons = await couponModel.find({isActive : "Active"})
+
+
         if (cart || cart.products.length > 0) {
             let totalAmount = 0;
             cart.products.forEach(item => {
                 totalAmount += item.productId.rate * item.quantity;
             });
 
-            res.render('user/checkout', { user, cart, totalAmount, address });
+            const filteredCoupons = coupons.filter((coupon)=>{
+                return totalAmount > coupon.minimumPurchaseAmount 
+            })
+
+            res.render('user/checkout', { user, cart, totalAmount, address, filteredCoupons });
         } else {
             res.redirect('/user/viewCart', { user, cart });
-        }
+        }        
 
     } catch (e) {
         console.log(e);
         res.status(500).send("Error!");
     }
 }
+
+exports.getCouponData = async (req, res) => {
+    try {
+      const id = req.params.id;
+  
+      // Find the coupon by its ID
+      const coupon = await couponModel.findById(id);
+  
+      if (!coupon) {
+        return res.status(404).json({ error: 'Coupon not found' });
+      }
+  
+      // Send the coupon details as a JSON response
+      return res.status(200).json({
+        code: coupon.code,
+        discountPercentage: coupon.discountPercentage,
+        minimumPurchaseAmount: coupon.minimumPurchaseAmount,
+        isActive: coupon.isActive,
+        expiryDate: coupon.expiryDate,
+      });
+    } catch (error) {
+      console.error('Error fetching coupon data:', error);
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
+  };
 
 exports.orderPlaced = (req, res) => {
     try {

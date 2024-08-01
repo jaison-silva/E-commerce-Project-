@@ -1,233 +1,230 @@
 <%- include('../partials/userHeader') %>
 
+  <div class="bg-primary shadow-lg">
+    <div class="container py-3">
+      <!-- Breadcrumb -->
+      <nav class="d-flex">
+        <h5 class="mb-0">
+          <a href="/" class="text-white-50" style="text-decoration: none;">Home</a>
+          <span class="text-white mx-2"> > </span>
+          <a href="/user/category" class="text-white" style="text-decoration: none;">Menu</a>
+        </h5>
+      </nav>
+      <!-- Breadcrumb -->
+    </div>
+  </div>
+
   <!-- cards  -->
-
   <div class="container-fluid ">
-    <div class="container justify-content-center">
-      <div class="row">
-        <h1 class="text-center pt-5">Categories of food !</h1>
-      </div>
+    <div class="row">
+      <h1 class="text-center pt-5">Our delicious Menu !</h1>
+    </div>
 
-      <div class="container my-5">
-        <div class="row justify-content-center">
-
-          <% data.forEach(element=> { %>
-
-            <div class="col-sm-12 col-md-6 col-lg-3 d-12 gy-4 d-md-block d-flex justify-content-center">
-              <div class="card" style="width: 18rem;">
-                <div class="card-body">
-                  <h5 class="card-title"><%= element.name %></h5>
-                  <p class="card-text"><%= element.description %></p>
-                </div>
-                <ul class="list-group list-group-flush">
-                  <li class="list-group-item">Starts from Rs. <%= element.rate %>/-</li>
-                  <li class="list-group-item">Rating dummmy</li>
-                  <li class="list-group-item">A third item</li>
-                </ul>
-                <div class="card-body">
-                  <button type="button" class="btn btn-outline-warning"><a href="/user/category/products/<%=element._id %>" class="text-decoration-none">View Category</a></button>
-                </div>
-              </div>
+    <div class="row w-100 mt-5 ">
+      <form class="w-100 filter-form" action="/user/filterSort" method="GET">
+        <div class="d-flex justify-content-center">
+          <div class="search-bar flex-grow-2">
+            <div class="input-group">
+              <input type="text" name="search" class="form-control shadow-lg" placeholder="Search products..."
+                aria-label="Search" value="<%= searchQuery %>">
+              <button class="btn btn-primary" type="submit">Search</button>
             </div>
-
-             <% }); %>
-
           </div>
 
-          <!-- cards  -->
+          <div class="filter-options mx-2">
+            <div class="dropdown shadow-lg">
+              <button class="btn btn-secondary dropdown-toggle" type="button" id="filterDropdown"
+                data-bs-toggle="dropdown" aria-expanded="false">
+                Filter by
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="filterDropdown">
+                <% category.forEach((dropdown)=>{ %>
+                  <li class="d-flex justify-content-center">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" name="filter" value="<%= dropdown._id %>"
+                        id="category<%= dropdown._id %>" <%=selectedFilters.includes(dropdown._id.toString())
+                        ? 'checked' : '' %>>
+                      <label class="form-check-label" for="category<%= dropdown._id %>">
+                        <%= dropdown.name %>
+                      </label>
+                    </div>
+                  </li>
+                  <% }) %>
+              </ul>
+            </div>
+          </div>
 
-          <div class="container-fluid ">
-            <div class="container justify-content-center">
-              <div class="row">
-                <h1 class="text-center pt-5">Popular Dishes</h1>
+          <div class="sort-options mx-2">
+            <div class="dropdown shadow-lg">
+              <button class="btn btn-secondary dropdown-toggle" type="button" id="sortDropdown"
+                data-bs-toggle="dropdown" aria-expanded="false">
+                Sort by
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="sortDropdown">
+                <li class="d-flex justify-content-center">
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="sort" value="objectId" id="sortPriceDesc"
+                      <%=selectedSort==='price_hightolow' ? 'checked' : '' %>>
+                    <label class="form-check-label" for="sortPriceDesc">None</label>
+                  </div>
+                </li>
+                <li class="d-flex justify-content-center">
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="sort" value="price_hightolow" id="sortPriceDesc"
+                      <%=selectedSort==='price_hightolow' ? 'checked' : '' %>>
+                    <label class="form-check-label" for="sortPriceDesc">Price - Desc</label>
+                  </div>
+                </li>
+                <li class="d-flex justify-content-center">
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="sort" value="price_lowtohigh" id="sortPriceAsc"
+                      <%=selectedSort==='price_lowtohigh' ? 'checked' : '' %>>
+                    <label class="form-check-label" for="sortPriceAsc">Price - Asc</label>
+                  </div>
+                </li>
+                <li class="d-flex justify-content-center">
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="sort" value="name_lowtohigh" id="sortNameAsc"
+                      <%=selectedSort==='name_lowtohigh' ? 'checked' : '' %>>
+                    <label class="form-check-label" for="sortNameAsc">A-Z</label>
+                  </div>
+                </li>
+                <li class="d-flex justify-content-center">
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="sort" value="name_hightolow" id="sortNameDesc"
+                      <%=selectedSort==='name_hightolow' ? 'checked' : '' %>>
+                    <label class="form-check-label" for="sortNameDesc">Z-A</label>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary apply-button shadow-lg">Apply Filters & Sort</button>
+        </div>
+
+      </form>
+    </div>
+
+    <div class="container my-5">
+      <div class="row justify-content-center">
+        <div class="container" id="scrollspyHeading1">
+          <% if(products.length === 0 ) {%>
+            <div class="d-flex justify-content-center mt-5">
+              <h3>No results !</h3>
+            </div>
+          <% }else{ %>
+          <% products.forEach(product=> { %>
+            <div class="row p-3 w-100" style="height: auto;">
+              <div class="col-8">
+                <div class="card h-100 shadow-lg" style="max-width: auto;">
+                  <div class="row g-0">
+                    <div class="col-md-4">
+                      <img src="/<%= product.images[0] %>" class="img-fluid rounded-start" alt="...">
+                    </div>
+                    <div class="col-md-8">
+                      <div class="card-body">
+                        <h5 class="card-title">
+                          <%= product.name %>
+                        </h5>
+                        <p class="card-text">Description : <%= product.description %>
+                        </p>
+                      </div>
+                      <ul class="list-group list-group-flush">
+                        <li class="list-group-item">Category : <%= product.category.name %>
+                        </li>
+                        <li class="list-group-item">Rating : <%= product.rating %>
+                        </li>
+                      </ul>
+                      <div class="card-body">
+                        <a href="/user/productDetailed/<%= product._id %>"><button type="button"
+                            class="btn btn-outline-info">View Details</button></a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
-
-              <div class="container my-5">
-
-                <div class="row">
-                  <div class="col-sm-12 col-md-6 col-lg-3 d-12 gy-4 d-md-block d-flex justify-content-center">
-                    <div class="card" style="width: 18rem;">
-                      <img src="/assets/img/roll.jpg" class="card-img-top" alt="...">
-                      <div class="card-body">
-                        <h5 class="card-title">Roll Shawarma</h5>
-                        <p class="card-text">Some quick example text to build on the card title and make up the bulk of
-                          the card's content.</p>
-                      </div>
-                      <ul class="list-group list-group-flush">
-                        <li class="list-group-item">Starts from Rs. 199/-</li>
-                        <li class="list-group-item">A second item</li>
-                        <li class="list-group-item">A third item</li>
-                      </ul>
-                      <div class="card-body">
-                        <button type="button" class="btn btn-outline-warning">View Category</button>
-                      </div>
-                    </div>
+              <div class="col-4">
+                <div class="card border-dark mb-3 h-100">
+                  <div class="card-header">
+                    <h3>Rs. <%= product.rate %>
+                    </h3>
                   </div>
-
-                  
-                  <div class="col-sm-12 col-md-6 col-lg-3 d-12 gy-4 d-md-block d-flex justify-content-center">
-                    <div class="card" style="width: 18rem;">
-                      <img src="/assets/img/burger.jpg" class="card-img-top" alt="...">
-                      <div class="card-body">
-                        <h5 class="card-title">Burger Shawarma</h5>
-                        <p class="card-text">Some quick example text to build on the card title and make up the bulk of
-                          the card's content.</p>
-                      </div>
-                      <ul class="list-group list-group-flush">
-                        <li class="list-group-item">Starts from Rs. 299/-</li>
-                        <li class="list-group-item">A second item</li>
-                        <li class="list-group-item">A third item</li>
-                      </ul>
-                      <div class="card-body">
-                        <button type="button" class="btn btn-outline-warning">View Category</button>
-                      </div>
-                    </div>
-                  </div>
-
-
-                  <div class="col-sm-12 col-md-6 col-lg-3 d-12 gy-4 d-md-block d-flex justify-content-center">
-                    <div class="card" style="width: 18rem;">
-                      <img src="/assets/img/Plate.jpg" class="card-img-top" alt="...">
-                      <div class="card-body">
-                        <h5 class="card-title">Plate Shawarma</h5>
-                        <p class="card-text">Some quick example text to build on the card title and make up the bulk of
-                          the card's content.</p>
-                      </div>
-                      <ul class="list-group list-group-flush">
-                        <li class="list-group-item">Starts from Rs. 399/-</li>
-                        <li class="list-group-item">A second item</li>
-                        <li class="list-group-item">A third item</li>
-                      </ul>
-                      <div class="card-body">
-                        <button type="button" class="btn btn-outline-warning">View Category</button>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="col-sm-12 col-md-6 col-lg-3 d-12 gy-4 d-md-block d-flex justify-content-center">
-                    <div class="card" style="width: 18rem;">
-                      <img src="/assets/img/juices.jpg" class="card-img-top" alt="...">
-                      <div class="card-body">
-                        <h5 class="card-title">juices</h5>
-                        <p class="card-text">Some quick example text to build on the card title and make up the bulk of
-                          the card's content.</p>
-                      </div>
-                      <ul class="list-group list-group-flush">
-                        <li class="list-group-item">Starts from Rs. 99/-</li>
-                        <li class="list-group-item">A second item</li>
-                        <li class="list-group-item">A third item</li>
-                      </ul>
-                      <div class="card-body">
-                        <button type="button" class="btn btn-outline-warning">View Category</button>
-                      </div>
-                    </div>
+                  <div class="card-body">
+                    <h5 class="card-title">Rating : <%= product.rating %>
+                    </h5>
+                    <p class="card-text">Some quick example text to build on the card title and make up the bulk
+                      of the card's content.</p>
                   </div>
                 </div>
               </div>
             </div>
+            <% })} %>
+        </div>
+      </div>
+    </div>
+  </div>
 
 
-            <!-- banner -->
+  <div class="d-flex justify-content-center mt-3" id="paginationForm">
+    <div class="btn-group btn-group-toggle" data-toggle="buttons">
+      <% for(let i = 1; i <= totalPages; i++) { %>
+        <label class="btn btn-secondary page-label <%= i == currentPage ? 'active' : '' %> mx-1">
+          <input type="radio" name="page" value="<%= i %>" <%= i == currentPage ? 'checked' : '' %>> <%= i %>
+        </label>
+      <% } %>
+    </div>
+  </div>
+  
 
-            <div class="container-fluid border-top border-bottom border-3 border-secondary border-dashed">
-              <div class="container d-flex justify-content-center">
-                <div class="row-md-7">
-                  <h1 class="text-center pt-5">Banner for the ad</h1>
-                </div>
-              </div>
-
-              <div class="container my-5">
-                <div class="row">
-                  <div class="col-md-7">
-                    <div id="carouselExampleCaptions2" class="carousel slide" data-bs-ride="carousel">
-                      <div class="carousel-indicators">
-                        <button type="button" data-bs-target="#carouselExampleCaptions2" data-bs-slide-to="0"
-                          class="active" aria-current="true" aria-label="Slide 1"></button>
-                        <button type="button" data-bs-target="#carouselExampleCaptions2" data-bs-slide-to="1"
-                          aria-label="Slide 2"></button>
-                        <button type="button" data-bs-target="#carouselExampleCaptions2" data-bs-slide-to="2"
-                          aria-label="Slide 3"></button>
-                      </div>
-                      <div class="carousel-inner">
-                        <div class="carousel-item active">
-                          <img src="/assets/img/caro-ad-1.jpg" class="d-block w-100 img-fluid" alt="...">
-                          <div class="carousel-caption d-none d-md-block">
-                            <h5>First slide label</h5>
-                            <p>Some representative placeholder content for the first slide.</p>
-                          </div>
-                        </div>
-                        <div class="carousel-item">
-                          <img src="/assets/img/caro-ad-1.jpg" class="d-block w-100 img-fluid" alt="...">
-                          <div class="carousel-caption d-none d-md-block">
-                            <h5>Second slide label</h5>
-                            <p>Some representative placeholder content for the second slide.</p>
-                          </div>
-                        </div>
-                        <div class="carousel-item">
-                          <img src="https://picsum.photos/800/400" class="d-block w-100 img-fluid" alt="...">
-                          <div class="carousel-caption d-none d-md-block">
-                            <h5>Third slide label</h5>
-                            <p>Some representative placeholder content for the third slide.</p>
-                          </div>
-                        </div>
-                      </div>
-                      <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleCaptions2"
-                        data-bs-slide="prev">
-                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Previous</span>
-                      </button>
-                      <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleCaptions2"
-                        data-bs-slide="next">
-                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Next</span>
-                      </button>
-                    </div>
-                  </div>
-                  <div class="col-md-5 mt-4">
-                    <h3>Redefining Shawarma Experience</h3>
-                    <h6 class="mt-2">
-                      Lip-smacking shawarma served with loads of precision and hygiene has become everyone's favorite
-                      in no time.
-                    </h6>
-                    <p class="mt-2">
-                      Our efforts and promises are on maintaining the consistency to serve our customers, the amazing
-                      mouth watering delicacy. Offering an exclusive and focused menu packed with Lebanese favorites
-                      and contemporary dishes, Al Taza has undoubtedly become the household name of Shawarma for
-                      Keralites since 2019. We have our exclusive outlets in Aluva, Edappally, Kaloor, Kalamassery,
-                      Perumbavoor, Calicut, Thiruvananthapuram, Kollam and Bangalore
-                    </p>
-                    <button type="button" class="btn btn-primary mt-2">Explore More!</button>
-                  </div>
-                </div>
-              </div>
-
+  <div class="container mt-5">
+    <h2 class="text-center">Popular Dishes</h2>
+    <h5 class="text-center mb-5">(Based on ratings)</h5>
+    <div class="row">
+      <% popularProducts.forEach(product => { %>
+        <div class="col-md-3 mb-4">
+          <div class="card h-100">
+            <img src="/<%= product.images[0] %>" class="card-img-top" alt="<%= product.name %>" style="object-fit: cover;
+    height: 200px;">
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title">
+                <%= product.name %>
+              </h5>
+              <p class="card-text">
+                Description: <%= product.description %>
+              </p>
+              <p class="card-text">
+                Price: Rs. <%= product.rate %>
+              </p>
+              <p class="card-text">
+                Ratings: <%= product.ratings %> 5
+              </p>
+              <a href="/user/productDetailed/<%= product._id %>" class="btn btn-primary mt-auto">View Details</a>
             </div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  </div>
 
-            <!-- pokki adi -->
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+  const pageLabels = document.querySelectorAll('.page-label');
+  pageLabels.forEach(label => {
+    label.addEventListener('click', function() {
+      const pageNumber = this.querySelector('input[name="page"]').value;
+      // alert(pageNumber);
+      changePage(pageNumber);
+    });
+  });
+});
 
-            <div class="container my-5">
-              <div class="row">
-                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 ">
-                  <i class="bi bi-bag-check " style="font-size: 60px;"></i>
-                  <h6>Free Delivery</h6>
-                  <p>Please note that free delivery is only for orders above a specific amount.</p>
-                </div>
-                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 ">
-                  <i class="bi bi-credit-card" style="font-size: 60px;"></i>
-                  <h6>100% Secure Payment</h6>
-                  <p>Please note that free delivery is only for orders above a specific amount.</p>
-                </div>
-                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 ">
-                  <i class="bi bi-tag" style="font-size: 60px;"></i>
-                  <h6>Daily Offer</h6>
-                  <p>Please note that free delivery is only for orders above a specific amount.</p>
-                </div>
-                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 ">
-                  <i class="bi bi-star-fill" style="font-size: 60px;"></i>
-                  <h6>Quality Guarantee</h6>
-                  <p>Please note that free delivery is only for orders above a specific amount.</p>
-                </div>
-              </div>
-            </div>
+function changePage(pageNumber) {
+  const url = new URL(window.location.href);
+  url.searchParams.set('page', pageNumber);
+  window.location.href = url.toString();   
+ 
+}
+</script>
 
-            <%- include('../partials/footer') %>
+  <%- include('../partials/footer') %>

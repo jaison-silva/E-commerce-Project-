@@ -6,12 +6,24 @@ const upload = require('../controllers/multer');
 const multer = require('multer')
 
 route.get('/', controller.dashBoard);
-route.post('/login', controller.login);
+route.post('/login', controller.login); 
 route.get('/logout', controller.logout);
 
 route.get('/users', controller.manageUsers)
 
+//offers route
+route.get('/offers', controller.offers)
+route.post('/updateOffers', controller.updateOffers)
+route.get('/deleteOffer/:id', controller.deleteOffer)
+
+//coupons route
+route.get('/coupon', controller.coupon)
+route.post('/addCoupon', controller.addCoupon)
+route.delete('/deleteCoupon/:id', controller.deleteCoupon)
+route.get('/changeCouponStatus/:id', controller.changeCouponStatus)
+
 route.get('/products', controller.adminProducts);
+route.get('/listProduct/:id', controller.listProduct);
 route.get('/category', controller.adminCategory)
 
 route.get('/addcategory', controller.addcategory)

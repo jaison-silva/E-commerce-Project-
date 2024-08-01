@@ -173,6 +173,14 @@
           confirmButtonText: 'OK'
         });
         window.history.replaceState({}, document.title, window.location.pathname);
+      }else if (message.includes('tokenExpired')) {
+        Swal.fire({
+          title: "Failure",
+          text: "The session has expired, Login in again !",
+          icon: "error",
+          confirmButtonText: 'Login'
+        });
+        window.history.replaceState({}, document.title, window.location.pathname);
       }
     } else if (message.includes('success')) {
       Swal.fire({

@@ -3,6 +3,8 @@
     <main data-bs-spy="scroll" data-bs-target="#navbar-example2" data-bs-root-margin="0px 0px -40%"
         data-bs-smooth-scroll="true" class="scrollspy-example bg-body-tertiary p-3 rounded-2" tabindex="0">
 
+        <div class="div d-flex justify-content-center my-5"><h5>Products Based on the category : <%= data[0].category.name %> %></h5></div>
+
         <div class="container" id="scrollspyHeading1">
             <% data.forEach(product=>{ %>
             <div class="row p-3 w-100" style="height: 400px;">
@@ -19,8 +21,7 @@
                                 </div>
                                 <ul class="list-group list-group-flush">
                                     <li class="list-group-item">Category : <%= product.category.name %></li>
-                                    <li class="list-group-item">A second item</li>
-                                    <li class="list-group-item">A third item</li>
+                                    <li class="list-group-item">Rating : <%= product.rating %></li>
                                 </ul>
                                 <div class="card-body">
                                     <button type="button" class="btn btn-outline-warning">Add to cart</button>
@@ -44,7 +45,6 @@
             </div>
         <% }) %>
         </div>
-
         
         <!-- pokki adi -->
 

@@ -20,18 +20,18 @@
     </head>
 
     <div class="bg-primary">
-        <div class="container py-4">
+        <div class="container py-3">
             <!-- Breadcrumb -->
             <nav class="d-flex">
                 <h5 class="mb-0">
-                    <a href="" class="text-white-50">Home</a>
-                    <span class="text-white-50 mx-2"> > </span>
-                    <a href="" class="text-white-50">Profile</a>
+                    <a href="/" class="text-white-50" style="text-decoration: none;">Home</a>
+                    <span class="text-white mx-2"> > </span>
+                    <a href="/user/profile" class="text-white" style="text-decoration: none;">Account</a>
                 </h5>
             </nav>
             <!-- Breadcrumb -->
         </div>
-    </div>
+      </div>
 
     <section class="pt-3 shadow-lg"> <!-- Added shadow-lg class for a larger shadow -->
         <div class="container">
@@ -44,8 +44,8 @@
                             <p class="text-muted">Your personal dashboard</p>
                         </div>
                         <div class="text-center my-3">
-                            <a class="nav-link" href="/cart">
-                                <i class="fa-solid fa-wallet me-1"></i>Wallet Amount: <%= user.wallet%>
+                            <a class="nav-link" href="/user/viewCart">
+                                <i class="fa-solid fa-wallet me-1"></i>Wallet Amount: <%= user.wallet.toFixed(2)%>
                             </a>
                         </div>
                         <hr>
@@ -63,11 +63,11 @@
                                         class="btn btn-secondary w-100">My Orders</button></a>
                             </li>
                             <li>
-                                <a href="/wishlisted" class="text-decoration-none text-dark d-block py-2"><button
+                                <a href="/user/viewWishlist" class="text-decoration-none text-dark d-block py-2"><button
                                         class="btn btn-secondary w-100">My Wishlist</button></a>
                             </li>
                             <li>
-                                <a href="/wallethistory" class="text-decoration-none text-dark d-block py-2"><button
+                                <a href="/user/wallethistory" class="text-decoration-none text-dark d-block py-2"><button
                                         class="btn btn-secondary w-100">Wallet History</button></a>
                             </li>
                             <li>
@@ -110,7 +110,6 @@
                                     <div class="card-body p-4">
                                         <div class="d-flex justify-content-between align-items-center">
                                             <h6>Information</h6>
-                                            <button class="btn btn-warning"> Edit Profile</button>
                                         </div>
                                         <hr class="mt-0 mb-4">
                                         <div class="row pt-1">
@@ -165,16 +164,28 @@
             const editNameContainer = document.getElementById('editNameContainer');
             const nameInput = document.getElementById('nameInput');
             const updateNameButton = document.getElementById('updateNameButton');
-
+    
             nameEditButton.addEventListener('click', () => {
                 userName.style.display = 'none';
                 editNameContainer.style.display = 'block';
                 nameInput.value = userName.innerText.trim(); // Set the input value to the current name
             });
-
+    
             updateNameButton.addEventListener('click', async () => {
                 const newName = nameInput.value;
-
+    
+                // Regex pattern: only allows letters and spaces, 2-50 characters long
+                const namePattern = /^(?=.*[A-Za-z])[A-Za-z\s]{2,50}$/;
+    
+                if (!namePattern.test(newName)) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Invalid Name',
+                        text: 'Name must be between 2 and 50 characters and can only contain letters and spaces.',
+                    });
+                    return;
+                }
+    
                 try {
                     const response = await fetch('/user/updateProfile', {
                         method: 'PATCH',
@@ -193,6 +204,12 @@
                         }).then(() => {
                             window.location.reload();
                         });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Update Failed',
+                            text: 'Failed to update name. Please try again.',
+                        });
                     }
                 } catch (error) {
                     Swal.fire({
@@ -200,12 +217,11 @@
                         title: 'Oops...',
                         text: 'An error occurred. Please try again later.',
                     });
-                };
+                }
             });
         });
-
-
     </script>
+    
 
     <script>
         const urlParams = new URLSearchParams(window.location.search);

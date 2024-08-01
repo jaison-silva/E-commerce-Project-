@@ -2,8 +2,10 @@ const Category = require('../models/categoryModel')
 const Product = require('../models/productModel')
 const userModel = require('../models/userModel')
 const orderModel = require('../models/orderModel')
+const couponModel = require('../models/couponModel')
 const cartModel = require('../models/cartModel')
 const addressModel = require('../models/addressModel')
+const walletHistoryModel = require('../models/walletHistoryModel')
 const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
 const { mongoose } = require('mongoose');
@@ -18,9 +20,9 @@ exports.forgot = async (req, res) => {
         const token = req.cookies.userJwtAuth;
         const decoded = jwt.verify(token, "secret_key")
 
-        const response = await userModel.findOne({email: decoded.email})
+        const response = await userModel.findOne({ email: decoded.email })
 
-        if(!response.password){
+        if (!response.password) {
             return res.redirect('/user/profile?msg=noPass')
         }
 
@@ -49,7 +51,7 @@ exports.api_login = async (req, res) => {
         if (user.password === password) {
             const token = { email: email };
             const userToken = jwt.sign(token, "secret_key", {
-                expiresIn: '4h'
+                expiresIn: '15m'
             });
 
             res.cookie('userJwtAuth', userToken, {
@@ -191,7 +193,7 @@ exports.registerUser = async (req, res) => {
         }
 
         const userToken = jwt.sign(token, "secret_key", {
-            expiresIn: '4h'
+            expiresIn: ''
         });
 
         res.cookie('userJwtAuth', userToken, {
@@ -203,20 +205,6 @@ exports.registerUser = async (req, res) => {
     } catch (err) {
         console.error("There was an error saving the data: ", err);
         res.status(500).send("There was an error saving the data");
-    }
-}
-
-exports.category = async (req, res) => {
-    try {
-        const data = await Category.find()
-        if (req.cookies && req.cookies.userJwtAuth) {
-            res.render('user/category', { data, user: true })
-        } else {
-            res.render('user/category', { data, user: false })
-        }
-    } catch (err) {
-        console.log(err)
-        res.status(500).send(err)
     }
 }
 
@@ -274,11 +262,13 @@ exports.placeOrder = async (req, res) => {
         const decoded = jwt.verify(token, "secret_key");
 
 
-        const { addressId, cartId, PaymentMethod, paymentStatus } = req.body
+        const { couponId, addressId, cartId, PaymentMethod, paymentStatus } = req.body
+        console.log(couponId)
 
-        const [usercart, address, user] = await Promise.all([
+        const [usercart, address, coupon, user] = await Promise.all([
             cartModel.findById(cartId).populate("products.productId"),
             addressModel.findById(addressId),
+            couponModel.findById(couponId),
             userModel.findOne({ email: decoded.email }),
         ])
 
@@ -297,16 +287,30 @@ exports.placeOrder = async (req, res) => {
             totalAmount += item.productId.rate * item.quantity;
         });
 
+        if (coupon) {
+            const discount = (totalAmount * coupon.discountPercentage) / 100;
+            totalAmount -= discount;
+        }
+
         if (PaymentMethod == "M&G Wallet") {
             console.log("walet debit triggereds")
+
             const updatedUser = await userModel.findOneAndUpdate(
                 { email: decoded.email },
                 { $inc: { wallet: -totalAmount } },
                 { new: true }
             );
 
-            if (!updatedUser) {
-                throw new Error("Failed to update wallet balance");
+            console.log(updatedUser + " this is the return from the wallet balance update")
+
+            const walletUpdate = await walletHistoryModel.findOneAndUpdate(
+                { userId: req.user._id },
+                { $push: { history: { amount: totalAmount, type: 'debit', walletBalance: updatedUser.wallet } } },
+                { new: true, upsert: true }
+            )
+
+            if (!updatedUser || !walletUpdate) {
+                throw new Error("Failed to update wallet balance" + updatedUser + walletUpdate);
             }
             console.log("Wallet updated successfully:", updatedUser);
         }
@@ -318,17 +322,109 @@ exports.placeOrder = async (req, res) => {
             totalAmount: totalAmount,
             shippingAddress: address._id,
             paymentMethod: PaymentMethod,
-            paymentStatus
+            paymentStatus,
         });
 
-        await order.save();
+        const newOrderData = await order.save();
 
         // Delete the cart
         await cartModel.findByIdAndDelete(cartId);
 
-        res.render('user/orderPlaced', { user: true })
+        return res.render('user/orderPlaced', { user: true, orderDate: newOrderData._id })
     } catch (e) {
         console.log(e);
         res.status(500).send("Erorr")
     }
 }
+
+// exports.category = async (req, res) => {
+//     try {
+//         const popularProducts = await Product.find().sort({ rating: -1 }).limit(4).populate('category')
+//         const products = await Product.find().populate('category')
+//         const category = await Category.find({ listing: true })
+
+//         if (req.cookies && req.cookies.userJwtAuth) {
+//             res.render('user/category', { category, popularProducts, products, user: true })
+//         } else {
+//             res.render('user/category', { category, popularProducts, products, user: false })
+//         }
+
+//     } catch (err) {
+//         console.log(err)
+//         res.status(500).send(err)
+//     }
+// }
+
+exports.filterSort = async (req, res) => {
+    try {
+        const popularProducts = await Product.find()
+            .sort({ rating: -1 })
+            .limit(4)
+            .populate('category');
+
+        const { search = '', sort = 'objectId', filter = [], limit = 5 } = req.query;
+        let { page = 1 } = req.query;
+        
+        const filters = Array.isArray(filter) ? filter : filter ? [filter] : [];
+
+        const category = await Category.find({ listing: true });
+
+        const sortOptions = {
+            price_lowtohigh: { rate: 1 },
+            price_hightolow: { rate: -1 },
+            name_lowtohigh: { name: 1 },
+            name_hightolow: { name: -1 },
+            objectId: { _id: -1 } 
+        };
+
+        const sortCriteria = sortOptions[sort] || sortOptions.objectId;
+
+        const query = {
+            name: { $regex: search, $options: 'i' }
+        };
+
+        if (filters.length > 0) {
+            query.category = { $in: filters };
+        }
+
+        const total = await Product.countDocuments(query);
+        const totalPages = Math.ceil(total / limit);
+
+        page = Math.max(1, Math.min(totalPages, parseInt(page)));
+
+        const products = await Product.find(query)
+            .populate('category')
+            .sort(sortCriteria)
+            .skip((page - 1) * limit)
+            .limit(parseInt(limit));
+
+        if (req.cookies && req.cookies.userJwtAuth) {
+            res.render('user/category', {
+                user: true,
+                products,
+                currentPage: parseInt(page),
+                totalPages,
+                searchQuery: search,
+                selectedFilters: filters,
+                selectedSort: sort,
+                category,
+                popularProducts
+            });
+        } else {
+            res.render('user/category', {
+                user: false,
+                products,
+                currentPage: parseInt(page),
+                totalPages,
+                searchQuery: search,
+                selectedFilters: filters,
+                selectedSort: sort,
+                category,
+                popularProducts
+            });
+        }
+    } catch (error) {
+        console.error(error.message); 
+        res.status(500).send("An error occurred while processing your request.");
+    }
+};

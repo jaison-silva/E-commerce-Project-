@@ -1,19 +1,18 @@
 <%- include('../partials/userHeader') %>
 
-
-    <div class="bg-primary">
-        <div class="container py-4">
-            <!-- Breadcrumb -->
-            <nav class="d-flex">
-                <h5 class="mb-0">
-                    <a href="/user/index" class="text-white-50">Home</a>
-                    <span class="text-white-50 mx-2"> > </span>
-                    <a href="user/viewWishlist" class="text-white-50">Wishlist</a>
-                </h5>
-            </nav>
-            <!-- Breadcrumb -->
-        </div>
+<div class="bg-primary">
+    <div class="container py-3">
+        <!-- Breadcrumb -->
+        <nav class="d-flex">
+            <h5 class="mb-0">
+                <a href="/" class="text-white-50" style="text-decoration: none;">Home</a>
+                <span class="text-white mx-2"> > </span>
+                <a href="/user/viewWishlist" class="text-white" style="text-decoration: none;">Wishlist</a>
+            </h5>
+        </nav>
+        <!-- Breadcrumb -->
     </div>
+  </div>
 
     <div class="container-fluid py-5 d-flex justify-content-center gradient-custom">
 
@@ -75,6 +74,8 @@
                                                 data-mdb-tooltip-init title="Remove item">
                                                 <i class="fas fa-trash"></i>
                                             </button>
+                                            <button class="btn btn-primary  addToCart" onclick="addToCart()" data-id="<%= product.productId._id %>"> <i
+                                                class="me-1 fa fa-shopping-basket"></i> Add to cart </button>
                                         </p>
                                         <!-- Data -->
                                     </div>
@@ -124,6 +125,54 @@
             }
 
         }
+
+
+        async function addToCart() {
+        try {
+          const button = document.querySelector(".addToCart");
+        //   const quantity = document.querySelector('.quantity').value;
+          const quantity = 1
+          const productId = button.getAttribute('data-id');
+          const response = await fetch(`/user/addToCart?qty=${quantity}`, {
+            method: "POST", headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ id: productId })
+          })
+
+          const data = await response.json();
+
+          if (data.message === "success") {
+            Swal.fire({
+              icon: 'success',
+              title: 'Product Added!',
+              text: 'The product has been added to your cart.'
+            });
+            remove()
+          } else if (data.message === "excess") {
+            Swal.fire({
+              icon: 'Only 5 quantity allowed, 5 quantity is in cart',
+              title: 'Quantity Limit Reached',
+              text: 'You have reached the maximum quantity for this product.'
+            });
+          } else {
+            // Handle other potential error messages from the server
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: data.message || 'An error occurred while adding the product to your cart.'
+            });
+          }
+        } catch (error) {
+          console.error('Fetch Error:', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'An error occurred while processing your request.'
+          })
+        }
+      }
+
     </script>
 
     <%- include('../partials/footer') %>

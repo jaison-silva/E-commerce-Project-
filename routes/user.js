@@ -10,6 +10,7 @@ const controller = require('../controllers/userController')
 const profileController = require('../controllers/profileController')
 const wishlistControler = require('../controllers/wishlistControler')
 const cartController = require('../controllers/cartController')
+const reportController = require('../controllers/reportController')
 
 
 route.get('/login', controller.loginPage)
@@ -20,7 +21,6 @@ route.patch('/updatePassword', controller.updatePassword)
 
 // route.post('/upload',controller.upload)
 
-route.get('/category',userDataGetter,checkUserStatus, controller.category)
 
 route.get('/products',userDataGetter,checkUserStatus, userJwtAuth, controller.products)
 
@@ -35,6 +35,15 @@ route.delete('/deleteAddress/:id',userDataGetter,checkUserStatus, profileControl
 route.delete('/deleteProduct/:id',userDataGetter,checkUserStatus, cartController.deleteProduct)
 
 // route.delete('/editAddress/:id', profileController.editAddress)
+
+// search filter sort
+
+route.get('/filterSort',controller.filterSort )
+
+route.get('/category', controller.filterSort)
+
+//invoice donwload
+route.get('/invoice/:id',reportController.generateInvoice)
 
 // Profile routess
  
@@ -76,10 +85,13 @@ route.delete('/deleteFromWishList/:id',userDataGetter,checkUserStatus,wishlistCo
 route.get('/viewCart',userDataGetter,checkUserStatus,cartController.viewCart)
 route.post('/addToCart',userDataGetter,checkUserStatus,cartController.addToCart)
 route.post('/updateQuantity',userDataGetter,checkUserStatus, cartController.updateQuantity);
+route.get('/getCouponData/:id',userDataGetter,checkUserStatus, cartController.getCouponData);
 
 route.get('/checkout',userDataGetter,checkUserStatus, cartController.renderCheckout)
 route.get('/orderPlaced',userDataGetter,checkUserStatus, cartController.orderPlaced)
 route.post('/placeOrder',userDataGetter,checkUserStatus,controller.placeOrder);
 
+//Wallet History Routes
+route.get('/walletHistory',userDataGetter,checkUserStatus, profileController.walletHistory)
 
 module.exports = route

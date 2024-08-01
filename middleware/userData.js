@@ -8,15 +8,27 @@ exports.userDataGetter = async (req, res, next) => {
         return res.redirect('/user/login')
     }
 
-    const decoded = jwt.verify(token, 'secret_key');
+    jwt.verify(token, process.env.KEY, async (err, decoded) => {
+
+        if (err) {
+            if (err.name === 'TokenExpiredError') {
+                res.clearCookie('userJwtAuth');
+                return res.redirect('/user/login?msg=tokenExpired');
+            } else {
+                return res.status(401).send('Unauthorized');
+            }
+        } else {
+            const user = await userModel.findOne({ email: decoded.email })
+
+            if (!user) {
+                return res.redirect('/user/login')
+            }
+
+            req.user = user
+            next()
+        }
+    });
 
 
-    const user = await userModel.findOne({ email: decoded.email })
 
-    if (!user) {
-        return res.redirect('/user/login')
-    }
-
-    req.user = user
-    next()
 }

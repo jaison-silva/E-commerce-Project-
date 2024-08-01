@@ -1,9 +1,21 @@
 <%- include('../partials/userHeader') %>
 
+<div class="bg-primary shadow-lg">
+    <div class="container py-3">
+        <!-- Breadcrumb -->
+        <nav class="d-flex">
+            <h5 class="mb-0">
+                <a href="/" class="text-white" style="text-decoration: none;">Home</a>
+            </h5>
+        </nav>
+        <!-- Breadcrumb -->
+    </div>
+  </div>
+
     <!-- first carosal -->
 
     <main class="mt-5 mb-0">
-        <div class="container my-5">
+        <div class="container my-5 shadow-lg">
             <div class="row">
                 <div class="col-md-7">
                     <div id="carouselExampleCaptions1" class="carousel slide" data-bs-ride="carousel">
@@ -50,7 +62,7 @@
                         </button>
                     </div>
                 </div>
-                <div class="col-md-5 mt-4">
+                <div class="col-md-5 ">
                     <h3>Redefining Shawarma Experience</h3>
                     <h6 class="mt-2">
                         Lip-smacking shawarma served with loads of precision and hygiene has become everyone's favorite
@@ -63,7 +75,9 @@
                         Keralites since 2019. We have our exclusive outlets in Aluva, Edappally, Kaloor, Kalamassery,
                         Perumbavoor, Calicut, Thiruvananthapuram, Kollam and Bangalore
                     </p>
-                    <button type="button" class="btn btn-primary mt-2">Explore More!</button>
+                    <div class="div d-flex justify-content-end me-3">
+                    <button type="button" class="btn btn-primary">Explore More!</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -78,86 +92,31 @@
 
                 <div class="container my-5">
 
-                    <div class="row">
-                        <div class="col-md-3 d-12 d-md-block d-flex justify-content-center">
-                            <div class="card" style="width: 18rem;">
-                                <img src="/assets/img/roll.jpg" class="card-img-top" alt="...">
+                    <div class="row d-flex justify-content-center">
+                        <% category.forEach(element=> { %>
+
+                            <div class="col-sm-12 col-md-6 col-lg-3 d-12 gy-4 d-md-block mx-3 d-flex justify-content-center">
+                              <div class="card shadow-lg" style="width: 18rem;">
+                                <!-- // insert image herer -->
                                 <div class="card-body">
-                                    <h5 class="card-title">Roll Shawarma</h5>
-                                    <p class="card-text">Some quick example text to build on the card title and make up
-                                        the bulk of the card's content.</p>
+                                  <h5 class="card-title"><%= element.name %></h5>
+                                  <p class="card-text"><%= element.description %></p>
                                 </div>
                                 <ul class="list-group list-group-flush">
-                                    <li class="list-group-item">Starts from Rs. 199/-</li>
-                                    <li class="list-group-item">A second item</li>
-                                    <li class="list-group-item">A third item</li>
+                                  <li class="list-group-item">Starts from Rs. <%= element.rate %>/-</li>
+                                  <li class="list-group-item">Rating dummmy</li>
+                                  <li class="list-group-item">A third item</li>
                                 </ul>
                                 <div class="card-body">
-                                    <button type="button" class="btn btn-outline-warning">View Category</button>
-                                    <button type="button" class="btn btn-outline-info">Login</button>
+                                  <button type="button" class="btn btn-outline-warning"><a href="/user/category/products/<%=element._id %>" class="text-decoration-none">View Category</a></button>
                                 </div>
+                              </div>
                             </div>
+                
+                             <% }); %>
                         </div>
 
-                        <div class="col-md-3 d-12 d-md-block d-flex justify-content-center">
-                            <div class="card" style="width: 18rem;">
-                                <img src="/assets/img/burger.jpg" class="card-img-top" alt="...">
-                                <div class="card-body">
-                                    <h5 class="card-title">Burger Shawarma</h5>
-                                    <p class="card-text">Some quick example text to build on the card title and make up
-                                        the bulk of the card's content.</p>
-                                </div>
-                                <ul class="list-group list-group-flush">
-                                    <li class="list-group-item">Starts from Rs. 299/-</li>
-                                    <li class="list-group-item">A second item</li>
-                                    <li class="list-group-item">A third item</li>
-                                </ul>
-                                <div class="card-body">
-                                    <button type="button" class="btn btn-outline-warning">Menu</button>
-                                    <button type="button" class="btn btn-outline-info">Login</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-3 d-12 d-md-block d-flex justify-content-center">
-                            <div class="card" style="width: 18rem;">
-                                <img src="/assets/img/Plate.jpg" class="card-img-top" alt="...">
-                                <div class="card-body">
-                                    <h5 class="card-title">Plate Shawarma</h5>
-                                    <p class="card-text">Some quick example text to build on the card title and make up
-                                        the bulk of the card's content.</p>
-                                </div>
-                                <ul class="list-group list-group-flush">
-                                    <li class="list-group-item">Starts from Rs. 399/-</li>
-                                    <li class="list-group-item">A second item</li>
-                                    <li class="list-group-item">A third item</li>
-                                </ul>
-                                <div class="card-body">
-                                    <button type="button" class="btn btn-outline-warning">Menu</button>
-                                    <button type="button" class="btn btn-outline-info">Login</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-3 d-12 d-md-block d-flex justify-content-center">
-                            <div class="card" style="width: 18rem;">
-                                <img src="/assets/img/juices.jpg" class="card-img-top" alt="...">
-                                <div class="card-body">
-                                    <h5 class="card-title">juices</h5>
-                                    <p class="card-text">Some quick example text to build on the card title and make up
-                                        the bulk of the card's content.</p>
-                                </div>
-                                <ul class="list-group list-group-flush">
-                                    <li class="list-group-item">Starts from Rs. 99/-</li>
-                                    <li class="list-group-item">A second item</li>
-                                    <li class="list-group-item">A third item</li>
-                                </ul>
-                                <div class="card-body">
-                                    <button type="button" class="btn btn-outline-warning">Menu</button>
-                                    <button type="button" class="btn btn-outline-info">Login</button>
-                                </div>
-                            </div>
-                        </div>
+                        
                     </div>
                 </div>
 

@@ -3,6 +3,7 @@ const Product = require('../models/productModel')
 const userModel = require('../models/userModel')
 const orderModel = require('../models/orderModel')
 const addressModel = require('../models/addressModel')
+const walletHistoryModel = require('../models/walletHistoryModel')
 const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken')
 
@@ -225,6 +226,12 @@ exports.cancelOrder = async (req, res) => {
             { new: true } // To return the updated document
         );
 
+        await walletHistoryModel.findOneAndUpdate(
+            {userId: req.user._id},
+            { $push: { history: { amount: amount.totalAmount, type: 'credit', walletBalance : user.wallet } } },
+            { new: true, upsert: true }
+        )
+
         if (response) {
             res.json({ message: "Success" })
         }
@@ -255,3 +262,26 @@ exports.updateProfile = async (req, res) => {
     }
 
 }
+
+exports.walletHistory = async (req, res) => {
+    try {
+        const response = await walletHistoryModel.findOne({ userId: req.user._id });
+        response.history.sort((a, b) => b.dateCreated - a.dateCreated)
+        const user = req.user 
+        console.log(response + " this is the response")
+        if(user){
+            if (!response || response.history.length === 0) {
+                res.render('user/profile/walletHistory', { response: false, user });
+            } else {
+                res.render('user/profile/walletHistory', { response: response, user });
+            }
+        }
+     
+    } catch (error) {
+        // Handle error (optional)
+        console.error('Error fetching wallet history:', error);
+        res.status(500).send('Internal Server Error');
+    }
+}
+
+
