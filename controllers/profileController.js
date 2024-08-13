@@ -194,7 +194,7 @@ exports.orders = async (req, res) => {
 
         // Find the user in the database 
         const user = await userModel.findOne({ email: decoded.email });
-        const orders = await orderModel.find().populate('items.productId');
+        const orders = await orderModel.find().populate('items.productId').sort({orderedDate: -1})
         // console.log(orders)
 
         res.render('user/profile/myOrders', { orders, user })
@@ -210,7 +210,7 @@ exports.cancelOrder = async (req, res) => {
 
         const response = await orderModel.findByIdAndUpdate(id, {
             status: "Cancelled",
-            paymentStatus: "Cancelled"
+            paymentStatus: "Refunded"
         }, { new: true })
 
         const token = req.cookies.userJwtAuth;

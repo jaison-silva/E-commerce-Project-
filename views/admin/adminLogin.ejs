@@ -66,45 +66,52 @@
           confirmButtonText: 'OK'
         });
         window.history.replaceState({}, document.title, window.location.pathname);
+      } else if (message.includes('email')) {
+        Swal.fire({
+          title: "Failure",
+          text: "Email/ User not found!",
+          icon: "error",
+          confirmButtonText: 'OK'
+        });
+        window.history.replaceState({}, document.title, window.location.pathname);
+      } else if (message.includes('sessionExpired')) {
+        Swal.fire({
+          title: "Failure",
+          text: "Session Expired. Login again!",
+          icon: "error",
+          confirmButtonText: 'OK'
+        });
+        window.history.replaceState({}, document.title, window.location.pathname);
       }
-      if (message.includes('email')) {
-      Swal.fire({
-        title: "Failure",
-        text: "Email/ User not found!",
-        icon: "error",
-        confirmButtonText: 'OK'
-      });
-      window.history.replaceState({}, document.title, window.location.pathname);
     }
-  }
   </script>
 
- <script>
-  function validateForm() {
-    const email = document.querySelector('[name="email"]');
-    const password = document.querySelector('[name="password"]');
-    // console.log(email, password)
+  <script>
+    function validateForm() {
+      const email = document.querySelector('[name="email"]');
+      const password = document.querySelector('[name="password"]');
+      // console.log(email, password)
 
-    // Check if any field is empty or contains only whitespace
-    if (!email.value.trim() || !password.value.trim()) {
-      Swal.fire({
-        title: 'Error!',
-        text: 'All fields are necessary',
-        icon: 'error',
-        confirmButton: 'Cool'
-      })
-      return false;
-    } else if (password.value.split('').length < 8 || password.value.split('').length > 10) {
-      Swal.fire({
-        title: 'Error!',
-        text: 'Check Passowrd Credentials !',
-        icon: 'error',
-        confirmButton: 'Ok'
-      })
-      return false;
+      // Check if any field is empty or contains only whitespace
+      if (!email.value.trim() || !password.value.trim()) {
+        Swal.fire({
+          title: 'Error!',
+          text: 'All fields are necessary',
+          icon: 'error',
+          confirmButton: 'Cool'
+        })
+        return false;
+      } else if (password.value.split('').length < 8 || password.value.split('').length > 10) {
+        Swal.fire({
+          title: 'Error!',
+          text: 'Check Passowrd Credentials !',
+          icon: 'error',
+          confirmButton: 'Ok'
+        })
+        return false;
+      }
+      return true;
     }
-    return true;
-  }
-</script>
+  </script>
 
   <%- include('../partials/footer') %>

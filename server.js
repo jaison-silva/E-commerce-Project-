@@ -49,7 +49,7 @@ app.use('/user',userRoute);
 app.use('/admin',adminRoute);
 
 app.use("**", (req,res)=>{
-    res.send("Page not found Bruvh");
+    res.render('partials/404',{user: false});
 });
 
 app.listen(process.env.PORT || 3000, () => {

@@ -29,10 +29,21 @@
         </li>
       </ul>
     </div>
-    <div class="col-md-9 justify-content-center d-flex mt-5">
-      <div class="row">
-        <div class="col-md-12 d-flex justify-content-between align-items-center mt-5">
+    <div class="col-md-9 justify-content-center d-flex mt-0">
+      <div class="row ms-3">
+        <div class="col-md-12 d-flex justify-content-between align-items-center mb-0">
           <h3 class="mx-5">Orders</h3>
+          <nav aria-label="Page navigation">
+            <ul class="pagination mx-5">
+                <% for (let i = 1; i <= totalPages; i++) { %>
+                    <li class="page-item <%= i === page ? 'active' : '' %>">
+                        <a class="page-link" data-buttonNumber="<%= i %>">
+                            <%= i %>
+                        </a>
+                    </li>
+                <% } %>
+            </ul>
+        </nav>        
         </div>
 
         <div class="col-md-12 justify-content-center d-flex mt-5">
@@ -49,35 +60,35 @@
             </thead>
             <tbody>
               <% data.forEach(order=> { %>
-              <tr>
-                <td>
-                  <%= order.name %>
-                </td>
-                <td>
-                  <%= order.orderedDate.toLocaleString() %>
-                </td>
-                <td>
-                  <%= order.status %>
-                </td>
-                <td>
-                  <%= order.paymentStatus%>
-                </td>
-                <td>
-                  <%=order.totalAmount %>
-                </td>
-                <td>
-                  <% if(order.status === "Delivered") { %>
-                    <!-- Content for Delivered status -->
-                    <span class="text text-success">Delivered</span>
-                  <% } else if(order.status === "Pending") { %>
-                    <button class="btn btn-success deliverButton" data-id="<%= order._id %>">Deliver</button>
-                  <% } else if(order.status === "Cancelled") { %>
-                    <!-- Content for Cancelled status -->
-                    <span class="text text-danger">Cancelled</span>
-                  <% }  %>
-                </td>
-              </tr>
-              <% }) %>
+                <tr>
+                  <td>
+                    <%= order.name %>
+                  </td>
+                  <td>
+                    <%= order.orderedDate.toLocaleString() %>
+                  </td>
+                  <td>
+                    <%= order.status %>
+                  </td>
+                  <td>
+                    <%= order.paymentStatus%>
+                  </td>
+                  <td>
+                    <%=order.totalAmount %>
+                  </td>
+                  <td>
+                    <% if(order.status==="Delivered" ) { %>
+                      <!-- Content for Delivered status -->
+                      <span class="text text-success">Delivered</span>
+                      <% } else if(order.status==="Pending" ) { %>
+                        <button class="btn btn-success deliverButton" data-id="<%= order._id %>">Deliver</button>
+                        <% } else if(order.status==="Cancelled" ) { %>
+                          <!-- Content for Cancelled status -->
+                          <span class="text text-danger">Cancelled</span>
+                          <% } %>
+                  </td>
+                </tr>
+                <% }) %>
             </tbody>
           </table>
         </div>
@@ -85,11 +96,50 @@
     </div>
   </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script>
-    document.querySelectorAll('.deliverButton').forEach(button=>{
-      button.addEventListener('click', async () => {
-        const id = button.getAttribute('data-id');
-        try {
+
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.page-link').forEach((link) => {
+        link.addEventListener('click', function () {
+            const pageNumber = this.getAttribute('data-buttonNumber');
+            axios.get(`/admin/manageOrdersPagination/${pageNumber}`)
+                .then((response) => {
+                    const { pageData, page, totalPages } = response.data;
+                    document.querySelector('tbody').innerHTML = pageData.map(order => `
+                        <tr>
+                            <td>${order.name}</td>
+                            <td>${new Date(order.orderedDate).toLocaleString()}</td>
+                            <td>${order.status}</td>
+                            <td>${order.paymentStatus}</td>
+                            <td>${order.totalAmount}</td>
+                            <td>
+                                ${order.status === "Delivered" ?
+                                '<span class="text text-success">Delivered</span>' :
+                                order.status === "Pending" ?
+                                    `<button class="btn btn-success deliverButton" data-id="${order._id}">Deliver</button>` :
+                                    '<span class="text text-danger">Cancelled</span>'
+                                }
+                            </td>
+                        </tr>
+                    `).join('');
+
+                    // Update pagination
+                    document.querySelectorAll('.page-item').forEach(item => {
+                        item.classList.remove('active');
+                    });
+                    document.querySelector(`.page-item:nth-child(${page})`).classList.add('active');
+                    
+                    addListener(); // Ensure deliver buttons have event listeners
+                });
+        });
+    });
+
+    function addListener() {
+        document.querySelectorAll('.deliverButton').forEach(button => {
+            button.addEventListener('click', async () => {
+                const id = button.getAttribute('data-id');
+                try {
                     const response = await fetch(`/admin/deliverOrder/${id}`, {
                         method: "PATCH"
                     });
@@ -100,14 +150,13 @@
                             title: 'Order Updated',
                             text: `Order has been updated successfully.`,
                             confirmButtonText: 'OK'
-                        })
-                        .then(()=>{
+                        }).then(() => {
                             window.location.reload();
-                        })
+                        });
                     } else {
                         Swal.fire({
                             icon: 'error',
-                            title: 'Updattion Failed',
+                            title: 'Update Failed',
                             text: `Failed to update order. Please try again.`,
                             confirmButtonText: 'OK'
                         });
@@ -120,8 +169,13 @@
                         confirmButtonText: 'OK'
                     });
                 }
-      })
-    })
+            });
+        });
+    }
+
+    addListener();
+});
+
   </script>
 
   <%- include('../partials/footer') %>

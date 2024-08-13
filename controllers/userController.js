@@ -263,14 +263,17 @@ exports.placeOrder = async (req, res) => {
 
 
         const { couponId, addressId, cartId, PaymentMethod, paymentStatus } = req.body
-        console.log(couponId)
+        console.log(couponId + "_  this is the coupon id") 
+        console.log(paymentStatus + "_  this is the paymentstatus id") 
+        const authCouponId = couponId === "null" ? null : couponId
 
         const [usercart, address, coupon, user] = await Promise.all([
             cartModel.findById(cartId).populate("products.productId"),
             addressModel.findById(addressId),
-            couponModel.findById(couponId),
+            authCouponId ? couponModel.findById(couponId) :  Promise.resolve(null), // this added to solve the issue with coupon code
             userModel.findOne({ email: decoded.email }),
         ])
+        console.log(coupon + "_  this is the coupon") 
 
         // console.log(addressId, cartId, PaymentMethod, user)
 
@@ -330,10 +333,10 @@ exports.placeOrder = async (req, res) => {
         // Delete the cart
         await cartModel.findByIdAndDelete(cartId);
 
-        return res.render('user/orderPlaced', { user: true, orderDate: newOrderData._id })
+        return res.render('user/orderPlaced', { user: true, paymentStatus})
     } catch (e) {
         console.log(e);
-        res.status(500).send("Erorr")
+        res.status(500).send("Erorr" + e)
     }
 }
 
@@ -428,3 +431,16 @@ exports.filterSort = async (req, res) => {
         res.status(500).send("An error occurred while processing your request.");
     }
 };
+
+exports.retryPayment = async (req,res)=>{
+    console.log("hello from the back end");
+    const id = req.params.id
+    await orderModel.findByIdAndUpdate(id,{paymentStatus: "Completed"})
+    .then(()=>{
+        res.json({mission: "successfull"})
+    })
+    .catch((E)=>{
+        console.log(E)
+        res.status(500).send(E)
+    })
+}

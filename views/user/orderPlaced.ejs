@@ -24,15 +24,23 @@
                 <div class="card shadow-0 border">
                     <div class="p-4">
                         <h5 class="card-title mb-3">Order Confirmation</h5>
-                        <div class="alert alert-success" role="alert">
-                            <h4 class="alert-heading">Order Placed Successfully!</h4>
-                            <p>Your order has been placed successfully. Thank you for shopping with us!</p>
-                            <hr>
-                            <p class="mb-0">You will receive an email confirmation shortly.</p>
-                        </div>
+                       <% if(paymentStatus == "Failed"){%>
+                       <div class="alert alert-warning" role="alert">
+                        <h4 class="alert-heading">Order Placed but Payment failed, please pay to get it delivered !</h4>
+                        <p>Your order has been placed successfully and Payment is pending. Thank you for shopping with us!</p>
+                        <hr>
+                        <p class="mb-0">You will receive an email confirmation shortly.</p>
+                    </div>
+                        <% }else{ %>
+                            <div class="alert alert-success" role="alert">
+                                <h4 class="alert-heading">Order Placed Successfully!</h4>
+                                <p>Your order has been placed successfully. Thank you for shopping with us!</p>
+                                <hr>
+                                <p class="mb-0">You will receive an email confirmation shortly.</p>
+                            </div>
+                            <% } %>
                         <div class="text-center mt-4">
                             <a href="/" class="btn btn-primary">Continue Shopping</a>
-                            <!-- <a href="/user/invoice/<%= orderDate %>"><button class="btn btn-success" id="orderId" >Download Invoice</button></a> -->
                         </div>
                     </div>
                 </div>

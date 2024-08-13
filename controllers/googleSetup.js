@@ -8,7 +8,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "/user/redirect", 
+      callbackURL: "/user/redirect",
       session: false
     },
     (accessToken, refreshToken, profile, done) => {
@@ -22,7 +22,7 @@ passport.use(
           new UserDb({
             name: profile.displayName,
             email: profile.emails[0].value,
-            wallet : 0 
+            wallet: 0
           })
             .save()
             .then((newUser) => {
@@ -56,26 +56,30 @@ exports.googleAuth = passport.authenticate("google", {
 exports.googleRedirect = [
   passport.authenticate("google", { failureRedirect: "/", session: false }),
   (req, res) => {
-    // Debugging statement to check if req.user is set
-    if (!req.user) {
-      console.error('Authentication failed, req.user is undefined.');
-      return res.redirect("/?msg=authentication_failed");
+    try {
+      // Debugging statement to check if req.user is set
+      if (!req.user) {
+        console.error('Authentication failed, req.user is undefined.');
+        return res.redirect("/?msg=authentication_failed");
+      }
+
+      // Debugging statement to print the user object
+      console.log('Authenticated user:', req.user);
+
+      // Generate JWT token for user
+      const token = jwt.sign({ email: req.user.email }, "secret_key", {
+        expiresIn: "15m",
+      });
+
+      // Set token as cookie
+      res.cookie("userJwtAuth", token, {
+        httpOnly: true,
+      });
+
+      // Redirect to home with success message
+      res.redirect("/?msg=success");
+    } catch (error) {
+      console.log(error)
     }
-
-    // Debugging statement to print the user object
-    console.log('Authenticated user:', req.user);
-
-    // Generate JWT token for user
-    const token = jwt.sign({ email: req.user.email }, "secret_key", {
-      expiresIn: "15m",
-    });
-
-    // Set token as cookie
-    res.cookie("userJwtAuth", token, {
-      httpOnly: true,
-    });
-
-    // Redirect to home with success message
-    res.redirect("/?msg=success");
   }
 ];

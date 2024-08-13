@@ -2,7 +2,7 @@ const express = require('express')
 const route = express.Router()
 const controller = require('../controllers/adminController')
 const salesreportController = require('../controllers/reportController')
-const upload = require('../controllers/multer');
+const upload = require('../controllers/multer'); 
 const multer = require('multer')
 
 route.get('/', controller.dashBoard);
@@ -49,10 +49,13 @@ route.get('/editProduct/:id',controller.renderEdit);
 route.patch('/editProduct', controller.updateProduct);
 
 route.post('/addCategory',controller.addCategory)
+
 route.get('/manageOrders',controller.manageOrders);
+route.get('/manageOrdersPagination/:pageNumber',controller.manageOrdersPagination);
 
 route.patch('/deliverOrder/:id',controller.deliverOrder);
 
 route.post('/salesreport',salesreportController.generatereport)
+route.post('/generateChart',salesreportController.generateChart)
 
 module.exports = route

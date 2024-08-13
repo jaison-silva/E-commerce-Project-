@@ -32,7 +32,8 @@
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
     "pdfkit-table": "^0.1.99",
-    "razorpay": "^2.9.4"
+    "razorpay": "^2.9.4",
+    "stripe": "^16.7.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.2"
