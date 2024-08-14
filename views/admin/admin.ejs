@@ -28,21 +28,38 @@
                     <a class="nav-link" href="/admin/manageOrders">Orders</a>
                 </li>
                 <li class="nav-item mt-2 mt-2">
-                    <a class="nav-link border border-danger bg-danger text-white text-center" href="/admin/logout">Logout</a>
+                    <a class="nav-link border border-danger bg-danger text-white text-center"
+                        href="/admin/logout">Logout</a>
                 </li>
             </ul>
         </div>
-        <div class="col-md-9 justify-content-center d-flex mt-5">
-            <div class="container-fluid p-5">
-                <div class="row my-4 border">
+        <div class="col-md-9 px-4 justify-content-center d-flex ">
+            <div class="container-fluid ">
+                <div class="row  border">
+
+                    <h5>Sales data </h5>
+                    <div class="d-flex justify-content-end mt-4">
+                        <select name="filterType" id="" class="form-select w-25">
+                            <option value="weekly">Week</option>
+                            <option value="monthly">Month</option>
+                            <option value="yearly">Year</option>
+                        </select>
+                    </div>
+
+                    <div class="px-5" id="chart">
+                        <canvas id="myChart" width="125%" height="75px"></canvas>
+                    </div>
+
                     <div class="col-6 d-flex justify-content-center border p-4">
-                        <h6>Total Sales is : <%= overallSales %></h6>
+                        <h6>Total Sales is : <%= overallSales %>
+                        </h6>
                     </div>
                     <div class="col-6 d-flex justify-content-center border p-4">
-                        <h6>Total Amount is : <%= overallAmount.toFixed() %></h6>
+                        <h6>Total Amount is : <%= overallAmount.toFixed() %>
+                        </h6>
                     </div>
-                  </div>
-                <div class="row border p-4"> 
+                </div>
+                <div class="row border p-4">
                     <div class="col-md-6 offset-md-3">
                         <form id="salesReportForm" action="/admin/salesReport" method="POST">
                             <div class="mb-3">
@@ -65,37 +82,41 @@
                                     <input type="date" class="form-control" id="endDate" name="endDate">
                                 </div>
                             </div>
-                            <button type="submit" class="btn btn-primary" name="reportType" value="pdf">Generate PDF
+                            <button type="submit" class="btn btn-danger" name="reportType" value="pdf">Generate PDF
                                 Report</button>
-                            <!-- <button type="submit" class="btn btn-primary" name="reportType" value="excel" disabled>Generate Excel
-                                Report</button> -->
+                            <button type="submit" class="btn btn-success" name="reportType" value="excel">Generate Excel
+                                Report</button>
                         </form>
                     </div>
                     <div class="row my-4 border p-4">
                         <h4 class="text-center">Top 5 Selling Categories</h4>
                         <div class="col-12">
                             <ul class="list-group">
-                                <% topCategories.forEach((category) => { %>
+                                <% topCategories.forEach((category)=> { %>
                                     <li class="list-group-item d-flex justify-content-between align-items-center">
                                         <%= category.name %>
-                                        <span class="badge bg-primary rounded-pill"><%= category.totalQuantity %> sales</span>
+                                            <span class="badge bg-primary rounded-pill">
+                                                <%= category.totalQuantity %> sales
+                                            </span>
                                     </li>
-                                <% }) %>
+                                    <% }) %>
                             </ul>
                         </div>
                     </div>
-        
+
                     <!-- Top 5 Selling Products -->
                     <div class="row my-4 border border-rounded p-4">
                         <h4 class="text-center">Top 5 Selling Products</h4>
                         <div class="col-12">
                             <ul class="list-group">
-                                <% topProducts.forEach((product) => { %>
+                                <% topProducts.forEach((product)=> { %>
                                     <li class="list-group-item d-flex justify-content-between align-items-center">
                                         <%= product.name %>
-                                        <span class="badge bg-success rounded-pill"><%= product.quantitySold %> sales</span>
+                                            <span class="badge bg-success rounded-pill">
+                                                <%= product.quantitySold %> sales
+                                            </span>
                                     </li>
-                                <% }) %>
+                                    <% }) %>
                             </ul>
                         </div>
                     </div>
@@ -105,11 +126,15 @@
 
     </div>
     </main>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+
             const filterTypeSelect = document.getElementById('filterType');
             const customDateInputs = document.getElementById('customDateInputs');
+            let myChart = null;
 
             filterTypeSelect.addEventListener('change', function () {
                 if (filterTypeSelect.value === 'custom') {
@@ -118,7 +143,71 @@
                     customDateInputs.style.display = 'none';
                 }
             });
+
+            function renderChart(labelData, dataSetData) {
+
+                const ctx = document.getElementById('myChart').getContext('2d');
+
+                if (myChart) {
+                    myChart.destroy();
+                }
+
+                myChart = new Chart(ctx, {
+                    type: 'bar', // Specify the type of chart
+                    data: {
+                        labels: labelData,
+                        datasets: [{
+                            label: 'Number of sales',
+                            data: dataSetData,
+                            backgroundColor: [
+                                'rgba(255, 99, 132, 0.2)',
+                                'rgba(54, 162, 235, 0.2)',
+                                'rgba(255, 206, 86, 0.2)',
+                                'rgba(75, 192, 192, 0.2)',
+                                'rgba(153, 102, 255, 0.2)',
+                                'rgba(255, 159, 64, 0.2)'
+                            ],
+                            borderColor: [
+                                'rgba(255, 99, 132, 1)',
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(255, 206, 86, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(153, 102, 255, 1)',
+                                'rgba(255, 159, 64, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        },
+                        layout: {
+                            padding: 20
+                        }
+                    }
+                });
+            }
+
+            const select = document.querySelector('[name="filterType"]')
+            select.addEventListener('change', () => {
+                const value = select.value
+
+                axios.post('/admin/generateChart', {
+                    filterType: value
+                })
+                    .then((json) => {
+                        renderChart(json.data.labelData, json.data.dataSetData)
+                    })
+                    .catch((e) => {
+                        alert(e)
+                    })
+            })
+
         });
+
     </script>
 
     <%- include('../partials/footer') %>

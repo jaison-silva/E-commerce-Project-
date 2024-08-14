@@ -34,7 +34,7 @@ route.delete('/deleteAddress/:id',userDataGetter,checkUserStatus, profileControl
 
 route.delete('/deleteProduct/:id',userDataGetter,checkUserStatus, cartController.deleteProduct)
 
-// route.delete('/editAddress/:id', profileController.editAddress)
+// route.delete('/editAddress/:id', profileController.editAddress) 
 
 // search filter sort
 
@@ -73,6 +73,8 @@ route.post('/api_login', controller.api_login)
 
 route.get("/google",googleController.googleAuth)
 
+route.get("/retryPayment/:id", controller.retryPayment)
+
 route.get("/redirect", googleController.googleRedirect)
 
 // Wishlist Routes
@@ -88,7 +90,7 @@ route.post('/updateQuantity',userDataGetter,checkUserStatus, cartController.upda
 route.get('/getCouponData/:id',userDataGetter,checkUserStatus, cartController.getCouponData);
 
 route.get('/checkout',userDataGetter,checkUserStatus, cartController.renderCheckout)
-route.get('/orderPlaced',userDataGetter,checkUserStatus, cartController.orderPlaced)
+// route.get('/orderPlaced',userDataGetter,checkUserStatus, cartController.orderPlaced)
 route.post('/placeOrder',userDataGetter,checkUserStatus,controller.placeOrder);
 
 //Wallet History Routes

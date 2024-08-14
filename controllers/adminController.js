@@ -16,7 +16,9 @@ exports.adminLogin = (req, res) => {
 
 exports.dashBoard = async (req, res) => {
     try {
-        if (req.cookies && req.cookies.adminJwtAuth) {
+        if (!(req.cookies && req.cookies.adminJwtAuth)){
+                res.redirect('/admin/adminLogin?msg=sessionExpired')
+        } 
             // Fetch orders with populated product details
             const orders = await orderModel.find({ status: 'Delivered' }).populate('items.productId');
             
@@ -49,7 +51,6 @@ exports.dashBoard = async (req, res) => {
                 .sort((a, b) => b.quantity - a.quantity)
                 .slice(0, 5);
 
-            // Aggregate category sales
             const categorySales = {};
 
             orders.forEach(order => {
@@ -63,16 +64,13 @@ exports.dashBoard = async (req, res) => {
                 });
             });
 
-            // Convert to array and sort by sales amount
             const sortedCategories = Object.entries(categorySales)
                 .map(([id, sales]) => ({ id, sales }))
                 .sort((a, b) => b.sales - a.sales);
 
-            // Fetch category names
             const categoryIds = sortedCategories.map(cat => cat.id);
             const categories = await Category.find({ _id: { $in: categoryIds } });
 
-            // Map category names to sales
             const topCategories = sortedCategories.map(cat => {
                 const category = categories.find(c => c._id.toString() === cat.id.toString());
                 return { name: category ? category.name : 'Unknown', sales: cat.sales };
@@ -81,7 +79,6 @@ exports.dashBoard = async (req, res) => {
             const overallSales = orders.length;
             const overallAmount = orders.reduce((acc, val) => acc + val.totalAmount, 0);
 
-            // Include number of products sold in top products
             const topProductsWithCount = sortedProducts.map(product => {
                 return {
                     name: product.name,
@@ -91,12 +88,13 @@ exports.dashBoard = async (req, res) => {
             });
 
             res.render('admin/admin', { overallSales, overallAmount, topProducts: topProductsWithCount, topCategories });
-        }
+        
     } catch (error) {
         console.error("Error in dashboard:", error);
         res.status(500).send("Server Error");
     }
 };
+
 exports.login = async (req, res) => {
     try {
         let { email, password } = req.body;
@@ -403,15 +401,41 @@ exports.deleteCategory = async (req, res) => {
 
 exports.manageOrders = async (req, res) => {
     try {
-        const data = await orderModel.find({});
-        console.log(data)
+        let page = 1
+        const limit = 5
+        const total = await orderModel.countDocuments();
+        const totalPages = Math.ceil(total / limit);
 
-        res.render('admin/manageOrders', { data })
+        const data = await orderModel.find().limit(limit)
+        // console.log(data)
+
+        res.render('admin/manageOrders', { data, totalPages , page })
     } catch (e) {
         console.log(e);
         res.status(500).send(e)
     }
 }
+
+exports.manageOrdersPagination = async (req, res) => {
+    const limit = 5;
+
+    let { pageNumber = 1 } = req.params;
+    pageNumber = parseInt(pageNumber);
+    if (isNaN(pageNumber) || pageNumber < 1) {
+        pageNumber = 1;
+    }
+
+    const total = await orderModel.countDocuments();
+    const totalPages = Math.ceil(total / limit);
+    const page = Math.max(1, Math.min(totalPages, pageNumber));
+
+    const pageData = await orderModel.find()
+        .skip((page - 1) * limit)
+        .limit(limit);
+
+    return res.json({ pageData, page, totalPages });
+}
+
 
 exports.deliverOrder = async (req, res) => {
     try {
@@ -589,7 +613,7 @@ exports.changeCouponStatus = async (req, res) => {
             newStatus = 'Active';
             couponStatus.isActive = newStatus;
             await couponStatus.save();
-            return res.status(200).json({ error: 'change status of coupon' });
+            return res.status(200).json({ success: 'change status of coupon' });
         } else if (couponStatus.isActive === 'Expired') {
             return res.status(200).json({ error: 'Cannot change status of an expired coupon' });
         }

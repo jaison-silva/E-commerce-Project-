@@ -3,17 +3,17 @@
   <!-- Heading -->
   <div class="bg-primary shadow-lg">
     <div class="container py-3 shadow-lg">
-        <!-- Breadcrumb -->
-        <nav class="d-flex">
-            <h5 class="mb-0">
-                <a href="/" class="text-white-50" style="text-decoration: none;">Home</a>
-                <span class="text-white-50 mx-2"> > </span>
-                <a href="/user/viewCart" class="text-white-50" style="text-decoration: none;">Cart</a>
-                <span class="text-white mx-2"> > </span>
-                <a href="/user/checkout" class="text-white" style="text-decoration: none;">Checkout</a>
-            </h5>
-        </nav>
-        <!-- Breadcrumb -->
+      <!-- Breadcrumb -->
+      <nav class="d-flex">
+        <h5 class="mb-0">
+          <a href="/" class="text-white-50" style="text-decoration: none;">Home</a>
+          <span class="text-white-50 mx-2"> > </span>
+          <a href="/user/viewCart" class="text-white-50" style="text-decoration: none;">Cart</a>
+          <span class="text-white mx-2"> > </span>
+          <a href="/user/checkout" class="text-white" style="text-decoration: none;">Checkout</a>
+        </h5>
+      </nav>
+      <!-- Breadcrumb -->
     </div>
   </div>
 
@@ -58,18 +58,18 @@
                     <div class="form-outline">
                       <% if (filteredCoupons.length> 0) { %>
                         <select name="couponId" id="couponId" class="form-select">
+                          <option value="null">
+                            Apply No coupon
+                          </option>
                           <% filteredCoupons.forEach(element=> { %>
-                            <option value="0">
-                              Apply No coupon
-                            </option>
                             <option value="<%= element._id %>">
                               <%= element.code %>
                             </option>
                             <% }) %>
                         </select>
                         <% } else { %>
-                          <select name="addressId" id="addressSelect" class="form-select">
-                            <option value="0">
+                          <select name="couponId" id="couponId" class="form-select">
+                            <option value="null">
                               "No coupons available"
                             </option>
                           </select>
@@ -88,7 +88,7 @@
                 <hr class="my-4" />
 
                 <h5 class="card-title mb-3">Payment method</h5>
-
+                <input type="hidden" name="paymentStatus" id="hiddenPaymentStatus" value="Completed">
                 <div class="row mb-3">
                   <div class="col-lg-4 mb-3">
                     <!-- Default checked radio -->
@@ -98,7 +98,9 @@
                           id="flexRadioDefault1" <%=totalAmount < 1000 ? "checked" : "disabled" %>/>
                         <label class="form-check-label" for="flexRadioDefault1">
                           Cash On Delivery <br />
-                          <small class="text-muted"><%=totalAmount < 1000 ? "Pay when product is delivered" : "Amount too high for COD" %> </small>
+                          <small class="text-muted">
+                            <%=totalAmount < 1000 ? "Pay when product is delivered" : "Amount too high for COD" %>
+                          </small>
                         </label>
                       </div>
                     </div>
@@ -108,7 +110,7 @@
                     <div class="form-check h-100 border rounded-3">
                       <div class="p-3">
                         <input class="form-check-input" type="radio" name="PaymentMethod" value="Razor Pay"
-                          id="flexRadioDefault2" />
+                          id="flexRadioDefault2" <%=totalAmount> 100 ? "" : "disabled" %>/>
                         <label class="form-check-label" for="flexRadioDefault2">
                           Razor Pay <br />
                           <small class="text-muted">Avail extra offers when using bank cards </small>
@@ -152,17 +154,23 @@
             <h6 class="mb-3">Summary</h6>
             <div class="d-flex justify-content-between">
               <p class="mb-2">Price:</p>
-              <p class="mb-2">$<%= totalAmount %>
-              </p>
+              <h6 class="mb-2">Rs. <%= totalAmount %>
+              </h6>
             </div>
-            <div class="d-flex justify-content-between">
-              <p class="mb-2" >Discount Percentage:</p>
-              <p class="mb-2 text-danger" id="DiscountElement">- $00.00</p>
+            <div id="DiscountElement">
+              <div class="d-flex justify-content-between">
+                <p class="mb-2 mr-2" style="display:inline;">Discount Percentage:</p>
+                <h6 class="mb-2 text-danger" style="display:inline;">0 %</h6>
+              </div>
+              <div class="d-flex justify-content-between">
+                <p class="mb-2 mr-2" style="display:inline;">Discount Amount:</p>
+                <h6 class="mb-2 text-danger" style="display:inline;">Rs. 0.00</h6>
+              </div>
             </div>
             <hr />
             <div class="d-flex justify-content-between">
               <p class="mb-2">Total price:</p>
-              <p class="mb-2 fw-bold" id="totalAmountElement">$<%= totalAmount %>
+              <p class="mb-2 fw-bold" id="totalAmountElement">Rs. <%= totalAmount %>
               </p>
             </div>
 
@@ -184,7 +192,7 @@
                   </a><br>
                   <p>Quantity: <%= product.quantity %>
                   </p>
-                  <div class="price text-muted">Total: $<%= (product.productId.rate * product.quantity).toFixed(2) %>
+                  <div class="price text-muted">Total: Rs. <%= (product.productId.rate * product.quantity).toFixed(2) %>
                   </div>
                 </div>
               </div>
@@ -198,96 +206,134 @@
   </section>
 
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
-
   <script>
-document.addEventListener('DOMContentLoaded', function () {
-  const razorpayRadio = document.getElementById('flexRadioDefault2');
-  const placeOrderButton = document.querySelector('button[type="submit"]');
-  const form = document.querySelector('form[action="/user/placeOrder"]');
-  let razorpayAmount = `<%= totalAmount %>` * 100; // Store the initial total amount in paise
 
-  placeOrderButton.addEventListener('click', function (event) {
-    if (razorpayRadio.checked) {
-      event.preventDefault();
+    document.addEventListener('DOMContentLoaded', function () {
+      var razorpayAmount = parseInt(`<%= totalAmount %>`);
 
-      // Razorpay configuration options
-      const options = {
-        key: "rzp_test_VsFnNZA1nNcWZT", // Enter your Razorpay Key ID
-        amount: razorpayAmount, // Use the updated amount in paise
-        currency: "INR",
-        name: "Meat & Greet",
-        description: "Food Purchased from M&G",
-        image: "https://your_logo_url.com", // Optional: Add your logo URL here
-        handler: function (response) {
-          // After successful payment
-          form.submit();
-        },
-        prefill: {
-          name: "<%= user.name %>", // Prefill customer's name from user data
-          email: "<%= user.email %>", // Prefill customer's email from user data
-          contact: "<%= user.contact %>" // Prefill customer's phone from user data
-        },
-        theme: {
-          color: "#3399cc" // Custom theme color
-        },
-        modal: {
-          ondismiss: function () {
-            alert("Payment process was interrupted. Please try again."); // Handle payment failure or cancellation
-          },
-          onpaymentfailed: function () {
-            // Handle payment failure
+      document.getElementById('couponId').addEventListener('change', async function () {
+        try {
+          const totalAmountElement = document.getElementById('totalAmountElement');
+          const DiscountElement = document.getElementById('DiscountElement');
+          const originalTotalAmount = parseInt(`<%= totalAmount %>`);
+          const couponId = this.value;
+
+          if (couponId === 'noCoupon') {
+            totalAmountElement.textContent = `Rs. ${originalTotalAmount.toFixed(2)}`;
+            DiscountElement.innerHTML = `  <div class="d-flex justify-content-between">
+                <p class="mb-2 mr-2" style="display:inline;">Discount Percentage:</p>
+                <h6 class="mb-2 text-danger" style="display:inline;">0 %</h6>
+              </div>
+              <div  class="d-flex justify-content-between">
+                <p class="mb-2 mr-2" style="display:inline;">Discount Amount:</p>
+                <h6 class="mb-2 text-danger" style="display:inline;">Rs. 0.00</h6>
+              </div>
+            </div>`
+            razorpayAmount = parseInt(originalTotalAmount);
+            return;
           }
+
+          const response = await axios.get(`/user/getcouponData/${couponId}`);
+          const coupon = response.data;
+
+          if (coupon && coupon.discountPercentage) {
+            const discountAmount = (originalTotalAmount * coupon.discountPercentage) / 100;
+            const newTotalAmount = originalTotalAmount - discountAmount;
+
+            totalAmountElement.textContent = `Rs. ${newTotalAmount.toFixed(2)}`;
+            DiscountElement.innerHTML = ` <div class="d-flex justify-content-between">
+                <p class="mb-2 mr-2" style="display:inline;">Discount Percentage:</p>
+                <h6 class="mb-2 text-danger" style="display:inline;">${coupon.discountPercentage} %</h6>
+              </div>
+              <div  class="d-flex justify-content-between">
+                <p class="mb-2 mr-2" style="display:inline;">Discount Amount:</p>
+                <h6 class="mb-2 text-danger" style="display:inline;">Rs. ${((discountAmount / 100) * originalTotalAmount).toFixed(2)}</h6>
+              </div>
+            </div>`
+            razorpayAmount = newTotalAmount;
+          }
+
+        } catch (error) {
+          console.error('Error fetching coupon details:', error);
+          return res.status(500).send(error)
         }
-      };
+      });
 
-      // Create a new Razorpay instance with the configuration options
-      const rzp = new Razorpay(options);
-      rzp.open(); // Open the Razorpay payment modal
-    } else {
-      form.submit(); // If Razorpay is not selected, submit the form normally
-    }
-  });
+      const form = document.querySelector('form[action="/user/placeOrder"]');
+      const razorpayRadio = document.getElementById('flexRadioDefault2');
+      const paymentMethods = document.querySelectorAll('input[name="PaymentMethod"]');
 
-  const couponSelect = document.getElementById('couponId');
-  const totalAmountElement = document.getElementById('totalAmountElement');
-  const DiscountElement = document.getElementById('DiscountElement')
-  const originalTotalAmount = parseFloat(totalAmountElement.textContent.replace('$', ''));
+      document.querySelector('button[type="submit"]').addEventListener('click', function (event) {
 
-  couponSelect.addEventListener('change', async function () {
-    const couponId = this.value;
+        let flag = false;
+        paymentMethods.forEach((method) => {
+          if (method.checked) {
+            flag = true;
+          }
+        });
 
-    if (couponId === '0') {
-      // If no coupon is selected, reset the total amount
-      totalAmountElement.textContent = `$${originalTotalAmount.toFixed(2)}`;
-      razorpayAmount = originalTotalAmount * 100; // Update the Razorpay amount
-      return;
-    }
+        if (!flag) {
+          event.preventDefault();
+          Swal.fire({
+            icon: 'error',
+            title: 'Payment Method Required',
+            text: 'Please select a payment method before placing the order.',
+          });
+          return;
+        }
 
-    try {
-      // Fetch the discount percentage for the selected coupon
-      const response = await axios.get(`/user/getcouponData/${couponId}`);
-      const coupon = response.data;
+        if (razorpayRadio.checked) {
+          event.preventDefault();
 
-      if (coupon && coupon.discountPercentage) {
-        // Calculate the discount and new total amount
-        const discountAmount = (originalTotalAmount * coupon.discountPercentage) / 100;
-        const newTotalAmount = originalTotalAmount - discountAmount;
+          const options = {
+            key: "rzp_test_VsFnNZA1nNcWZT",
+            amount: razorpayAmount * 100,
+            currency: "INR",
+            name: "Meat & Greet",
+            description: "Food Purchased from M&G",
+            image: "/assets/img/icon.jpg",
 
-        // Update the total amount in the UI
-        totalAmountElement.textContent = `$${newTotalAmount.toFixed(2)}`;
-        DiscountElement.textContent = `${coupon.discountPercentage} %`;
-        razorpayAmount = newTotalAmount * 100; // Update the Razorpay amount
-      }
-    } catch (error) {
-      console.error('Error fetching coupon details:', error);
-    }
-  });
-});
+            handler: function (response) {
+              document.getElementById('hiddenPaymentStatus').value = "Completed";
+              form.submit();
+            },
+            prefill: {
+              name: "<%= user.name %>",
+              email: "<%= user.email %>",
+            },
+            theme: {
+              color: "#3399cc",
+            },
+            modal: {
+              ondismiss: function () {
+                Swal.fire({
+                  icon: 'warning',
+                  title: 'Payment Interrupted',
+                  text: 'Payment process was interrupted. Please try again.'
+                });
+              }
+            }
+          };
+
+          const rzp = new Razorpay(options);
+
+          rzp.on("payment.failed", (e) => {
+            document.getElementById('hiddenPaymentStatus').value = "Failed";
+            form.submit();
+          });
+
+          rzp.open();
+
+        } else {
+          form.submit();
+        }
+      });
+    });
+
+
   </script>
 
 

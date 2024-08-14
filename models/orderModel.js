@@ -25,7 +25,8 @@ const orderSchema = new mongoose.Schema({
     }],
     orderedDate: {
         type: Date,
-        default: () => new Date().toISOString().split('T')[0]
+        default: Date.now
+        // default: () => new Date().toISOString().split('T')[0]
     },
     deliveredDate: {
         type: Date
@@ -46,8 +47,8 @@ const orderSchema = new mongoose.Schema({
     },
     paymentStatus: {
         type: String,
-        default: 'Pending',
-        enum: ['Pending', 'Completed', 'Failed', 'Cancelled', 'Refunded'],
+        default: 'Completed',
+        enum: ['Pending', 'Completed', 'Failed', 'Refunded'],
         required : true
     },
     totalAmount: {

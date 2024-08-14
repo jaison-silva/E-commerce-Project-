@@ -60,15 +60,15 @@
                             <a class="nav-link" href="/user/category"><i class="bi bi-menu-button-wide-fill"></i>
                                 Menu</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/user/viewWishlist"><i class="bi bi bi-heart me-2"></i>Wishlist</a>
-                        </li>
                         <% if(user===false){ %>
                             <li class="nav-item"> <button type="button" class="btn btn-outline-secondary"><i
                                         class="bi bi-box-arrow-in-right me-2"></i><a
                                         href="/user/login">Login</a></button>
                             </li>
                             <% }else{ %>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/user/viewWishlist"><i class="bi bi bi-heart me-2"></i>Wishlist</a>
+                                </li>
                                 <li class="nav-item">
                                     <a class="nav-link" href="/user/viewCart"><i class="bi bi-bag"></i> Cart</a>
                                 </li>

@@ -19,14 +19,33 @@ exports.viewCart = async (req, res) => {
             return res.send("user not found")
         }
 
-        const cart = await cartModel.findOne({ user: user._id, })
-        .populate({
-            path: 'products.productId', // First populate the productId
-            populate: {
-                path: 'category', // Then populate the category inside the productId
+        const rawCart = await cartModel.findOne({ user: user._id, })
+            .populate({
+                path: 'products.productId',
+                populate: {
+                    path: 'category',
+                }
+            });
+
+        if (rawCart) {
+            if (rawCart.products.length > 0) {
+                rawCart.products.map(async (product) => {
+                    if (product.listing == false) {
+                        await cartModel.deleteOne({ _id: product._id })
+                    }
+                })
             }
-        });
-            console.log("FFFFFFF",cart)
+        }
+
+        // console.log("FFFFFFF",cart)
+
+        const cart = await cartModel.findOne({ user: user._id, })
+            .populate({
+                path: 'products.productId',
+                populate: {
+                    path: 'category',
+                }
+            });
 
         let totalAmount = 0;
 
@@ -56,10 +75,10 @@ exports.addToCart = async (req, res) => {
 
         let cart = await cartModel.findOne({ user: user._id });
 
-        // 3. If Cart Doesn't Exist, Create One
+        // If no Cart  = Create One
         if (!cart) {
             cart = new cartModel({
-                user: user._id, 
+                user: user._id,
                 products: [{
                     productId,
                     quantity
@@ -84,13 +103,11 @@ exports.addToCart = async (req, res) => {
                 cart.products.push({
                     productId,
                     quantity,
-                    // ... other relevant product details if you're embedding the data
                 });
             }
         }
-        // 6. Save the Cart and Respond
         await cart.save();
-        res.status(200).json({ message: "success", cart }); // product added
+        res.status(200).json({ message: "success", cart }); 
 
     } catch (e) {
         console.error(e);
@@ -157,6 +174,22 @@ exports.renderCheckout = async (req, res) => {
             return res.send("user not found")
         }
 
+        // cart validation for listing of the product
+        const cartAuth = await cartModel.findOne({ user: user._id }).populate({
+            path: 'products.productId',
+            populate: {
+                path: 'category'
+            }
+        });
+
+        cartAuth.products.forEach(async (products) => {
+            if (products.listing == false) {
+                await cartModel.deleteOne({ _id: products._id })
+            }
+        })
+
+        //done
+
         const cart = await cartModel.findOne({ user: user._id }).populate({
             path: 'products.productId',
             populate: {
@@ -174,7 +207,7 @@ exports.renderCheckout = async (req, res) => {
             }
         });
 
-        const coupons = await couponModel.find({isActive : "Active"})
+        const coupons = await couponModel.find({ isActive: "Active" })
 
 
         if (cart || cart.products.length > 0) {
@@ -183,14 +216,14 @@ exports.renderCheckout = async (req, res) => {
                 totalAmount += item.productId.rate * item.quantity;
             });
 
-            const filteredCoupons = coupons.filter((coupon)=>{
-                return totalAmount > coupon.minimumPurchaseAmount 
+            const filteredCoupons = coupons.filter((coupon) => {
+                return totalAmount > coupon.minimumPurchaseAmount
             })
 
             res.render('user/checkout', { user, cart, totalAmount, address, filteredCoupons });
         } else {
             res.redirect('/user/viewCart', { user, cart });
-        }        
+        }
 
     } catch (e) {
         console.log(e);
@@ -200,28 +233,28 @@ exports.renderCheckout = async (req, res) => {
 
 exports.getCouponData = async (req, res) => {
     try {
-      const id = req.params.id;
-  
-      // Find the coupon by its ID
-      const coupon = await couponModel.findById(id);
-  
-      if (!coupon) {
-        return res.status(404).json({ error: 'Coupon not found' });
-      }
-  
-      // Send the coupon details as a JSON response
-      return res.status(200).json({
-        code: coupon.code,
-        discountPercentage: coupon.discountPercentage,
-        minimumPurchaseAmount: coupon.minimumPurchaseAmount,
-        isActive: coupon.isActive,
-        expiryDate: coupon.expiryDate,
-      });
+        const id = req.params.id;
+
+        // Find the coupon by its ID
+        const coupon = await couponModel.findById(id);
+
+        if (!coupon) {
+            return res.status(404).json({ error: 'Coupon not found' });
+        }
+
+        // Send the coupon details as a JSON response
+        return res.status(200).json({
+            code: coupon.code,
+            discountPercentage: coupon.discountPercentage,
+            minimumPurchaseAmount: coupon.minimumPurchaseAmount,
+            isActive: coupon.isActive,
+            expiryDate: coupon.expiryDate,
+        });
     } catch (error) {
-      console.error('Error fetching coupon data:', error);
-      return res.status(500).json({ error: 'Internal Server Error' });
+        console.error('Error fetching coupon data:', error);
+        return res.status(500).json({ error: 'Internal Server Error' });
     }
-  };
+};
 
 exports.orderPlaced = (req, res) => {
     try {
