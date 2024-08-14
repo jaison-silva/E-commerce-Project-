@@ -47,7 +47,7 @@
                         </div>
                         <div class="text-center my-3">
                             <a class="nav-link" href="/user/viewCart">
-                                <i class="fa-solid fa-wallet me-1"></i>Wallet Amount: <%= user.wallet%>
+                                <i class="fa-solid fa-wallet me-1"></i>Wallet Amount: <%= user.wallet.toFixed(2)%>
                             </a>
                         </div>
                         <hr>
@@ -57,15 +57,15 @@
                                         class="btn btn-secondary w-100">Profile</button></a>
                             </li>
                             <li>
-                                <a href="/useraddress" class="text-decoration-none text-dark d-block py-2"><button
+                                <a href="/user/address" class="text-decoration-none text-dark d-block py-2"><button
                                         class="btn btn-secondary w-100 ">Address</button></a>
                             </li>
                             <li>
-                                <a href="/userorders" class="text-decoration-none text-dark d-block py-2"><button
+                                <a href="/user/orders" class="text-decoration-none text-dark d-block py-2"><button
                                         class="btn btn-primary w-100">My Orders</button></a>
                             </li>
                             <li>
-                                <a href="/wishlisted" class="text-decoration-none text-dark d-block py-2"><button
+                                <a href="/user/viewWishlist" class="text-decoration-none text-dark d-block py-2"><button
                                         class="btn btn-secondary w-100">My Wishlist</button></a>
                             </li>
                             <li>
@@ -120,16 +120,22 @@
                                                                 </h5>
                                                                 <% if(order.status=="Pending" &&
                                                                     order.paymentStatus=="Completed" ) { %>
-                                                                    <p class="text-warning m-0 border-left border-secondary p-2">Status : Order Placed
+                                                                    <p
+                                                                        class="text-warning m-0 border-left border-secondary p-2">
+                                                                        Status : Order Placed
                                                                     </p>
                                                                     <button class="btn btn-warning cancelButton"
                                                                         id="pendingOrderId"
                                                                         data-orderId="<%= order._id %>">Cancel</button>
                                                                     <% } else if(order.status=="Cancelled" ) { %>
-                                                                        <p class="text-danger border-left border-danger m-0 p-2">Status : Cancelled</p>
+                                                                        <p
+                                                                            class="text-danger border-left border-danger m-0 p-2">
+                                                                            Status : Cancelled</p>
                                                                         <% } else if(order.status=="Pending" &&
                                                                             order.paymentStatus=="Failed" ) { %>
-                                                                            <p class="text-warning m-0 border-left border-secondary p-2">Status : Payment
+                                                                            <p
+                                                                                class="text-warning m-0 border-left border-secondary p-2">
+                                                                                Status : Payment
                                                                                 Pending</p>
                                                                             <button class="btn btn-success"
                                                                                 id="retryPayment"
@@ -226,8 +232,9 @@
 
 
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-    
-    // <script src="https://js.stripe.com/v3/"></script>
+
+    //
+    <script src="https://js.stripe.com/v3/"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
@@ -235,14 +242,22 @@
         document.addEventListener('DOMContentLoaded', (event) => {
 
             document.querySelectorAll('.cancelButton').forEach(button => {
-                button.addEventListener('click', async () => {
+                button.addEventListener('click',() => {
                     const id = button.getAttribute('data-orderId');
 
                     try {
-                        const response = await fetch(`/user/cancelOrder/${id}`, {
+                        Swal.fire({
+                            title: "Are you sure?",
+                            text: "You won't be able to revert this!",
+                            icon: "warning",
+                            showCancelButton: true,
+                            confirmButtonColor: "#3085d6",
+                            cancelButtonColor: "#d33",
+                            confirmButtonText: "Yes, delete it!"
+                        }).then(async (result) => {
+                            const response = await fetch(`/user/cancelOrder/${id}`, {
                             method: "PATCH"
                         });
-
                         if (response.ok) {
                             Swal.fire({
                                 icon: 'success',
@@ -261,6 +276,8 @@
                                 confirmButtonText: 'OK'
                             });
                         }
+                        });
+
                     } catch (error) {
                         Swal.fire({
                             icon: 'error',

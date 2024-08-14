@@ -24,9 +24,11 @@
             <!-- Breadcrumb -->
             <nav class="d-flex">
                 <h5 class="mb-0">
-                    <a href="" class="text-white-50">Home</a>
+                    <a href="/" class="text-white-50">Home</a>
                     <span class="text-white-50 mx-2"> > </span>
-                    <a href="" class="text-white-50">Profile</a>
+                    <a href="/user/profile" class="text-white-50">Profile</a>
+                    <span class="text-white-50 mx-2"> > </span>
+                    <a href="/user/address" class="text-white">Address</a>
                 </h5>
             </nav>
             <!-- Breadcrumb -->
@@ -45,7 +47,7 @@
                         </div>
                         <div class="text-center my-3">
                             <a class="nav-link" href="/user/viewCart">
-                                <i class="fa-solid fa-wallet me-1"></i>Wallet Amount: <%= user.wallet%>
+                                <i class="fa-solid fa-wallet me-1"></i>Wallet Amount: <%= user.wallet.toFixed(2)%>
                             </a>
                         </div>
                         <hr>
@@ -63,11 +65,11 @@
                                         class="btn btn-secondary w-100">My Orders</button></a>
                             </li>
                             <li>
-                                <a href="/user/wishlist" class="text-decoration-none text-dark d-block py-2"><button
+                                <a href="/user/viewWishlist" class="text-decoration-none text-dark d-block py-2"><button
                                         class="btn btn-secondary w-100">My Wishlist</button></a>
                             </li>
                             <li>
-                                <a href="/user/walletHistory"
+                                <a href="/user/wallethistory"
                                     class="text-decoration-none text-dark d-block py-2"><button
                                         class="btn btn-secondary w-100">Wallet History</button></a>
                             </li>

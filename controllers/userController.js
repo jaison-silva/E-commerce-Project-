@@ -226,7 +226,7 @@ exports.products = async (req, res) => {
 exports.cate_products = async (req, res) => {
     try {
         const data = await Product.find({ category: req.params.id }).populate('category')
-        console.log(data);
+        // console.log(data);
         if (req.cookies && req.cookies.userJwtAuth) {
             res.render('user/products', { data, user: true })
         } else {
@@ -270,7 +270,7 @@ exports.placeOrder = async (req, res) => {
         const [usercart, address, coupon, user] = await Promise.all([
             cartModel.findById(cartId).populate("products.productId"),
             addressModel.findById(addressId),
-            authCouponId ? couponModel.findById(couponId) :  Promise.resolve(null), // this added to solve the issue with coupon code
+            authCouponId ? couponModel.findById(couponId) :  Promise.resolve(null),
             userModel.findOne({ email: decoded.email }),
         ])
         console.log(coupon + "_  this is the coupon") 
