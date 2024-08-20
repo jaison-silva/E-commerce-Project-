@@ -127,7 +127,7 @@
                         <label class="form-check-label" for="flexRadioDefault3">
                           M&G Wallet<br />
                           <small class="text-muted">
-                            Your balance : <%= user.wallet %>
+                            Your balance : <%= user.wallet %>.toFixed(2)
                           </small> <br>
                           <small class="text-muted">
                             Use your amount kept with us to make this purchase !
@@ -221,7 +221,7 @@
           const originalTotalAmount = parseInt(`<%= totalAmount %>`);
           const couponId = this.value;
 
-          if (couponId === 'noCoupon') {
+          if (couponId === 'null') {
             totalAmountElement.textContent = `Rs. ${originalTotalAmount.toFixed(2)}`;
             DiscountElement.innerHTML = `  <div class="d-flex justify-content-between">
                 <p class="mb-2 mr-2" style="display:inline;">Discount Percentage:</p>
