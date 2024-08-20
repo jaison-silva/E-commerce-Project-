@@ -70,8 +70,8 @@ exports.addToCart = async (req, res) => {
         const decoded = jwt.verify(token, 'secret_key');
         const user = await userModel.findOne({ email: decoded.email });
         const productId = req.body.id;
-        let quantity = parseInt(req.query.qty);
-        // console.log("Trriggere" + quantity)
+        let {quantity = 1} = parseInt(req.query);
+        console.log("Trriggere" + quantity)
 
         let cart = await cartModel.findOne({ user: user._id });
 
@@ -167,6 +167,7 @@ exports.renderCheckout = async (req, res) => {
         const decode = jwt.verify(token, "secret_key");
 
         const user = await userModel.findOne({ email: decode.email })
+        user.wallet = user.wallet.toFixed(2)
         // console.log(user._id)
 
         if (!user) {

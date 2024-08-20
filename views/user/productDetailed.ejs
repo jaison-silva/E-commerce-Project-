@@ -218,7 +218,7 @@
           const button = document.querySelector(".addToCart");
           const quantity = document.querySelector('.quantity').value;
           const productId = button.getAttribute('data-id');
-          const response = await fetch(`/user/addToCart?qty=${quantity}`, {
+          const response = await fetch(`/user/addToCart?quantity=${quantity}`, {
             method: "POST", headers: {
               'Content-Type': 'application/json'
             },

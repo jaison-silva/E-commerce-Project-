@@ -19,7 +19,6 @@ exports.dashBoard = async (req, res) => {
         if (!(req.cookies && req.cookies.adminJwtAuth)){
                 res.redirect('/admin/adminLogin?msg=sessionExpired')
         } 
-            // Fetch orders with populated product details
             const orders = await orderModel.find({ status: 'Delivered' }).populate('items.productId');
             
             if (!orders) {
