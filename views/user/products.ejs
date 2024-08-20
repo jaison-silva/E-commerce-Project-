@@ -1,66 +1,81 @@
 <%- include('../partials/userHeader') %>
 
-  <!-- Heading -->
-  <div class="bg-primary shadow-lg">
-    <div class="container py-3 shadow-lg">
-      <!-- Breadcrumb -->
-      <nav class="d-flex">
-        <h5 class="mb-0">
-          <a href="/" class="text-white-50" style="text-decoration: none;">Home</a>
-          <span class="text-white mx-2"> > </span>
-          <a href="/user/category/products/<%= data[0].category._id %>" class="text-white" style="text-decoration: none;">Category Based </a>
-        </h5>
-      </nav>
-      <!-- Breadcrumb -->
+    <!-- Heading -->
+    <div class="bg-primary shadow-lg">
+        <div class="container py-3 shadow-lg">
+            <!-- Breadcrumb -->
+            <nav class="d-flex">
+                <h5 class="mb-0">
+                    <a href="/" class="text-white-50" style="text-decoration: none;">Home</a>
+                    <span class="text-white mx-2"> > </span>
+                    <a href="/user/category/products/<%= data[0].category._id %>" class="text-white"
+                        style="text-decoration: none;">Category Based </a>
+                </h5>
+            </nav>
+            <!-- Breadcrumb -->
+        </div>
     </div>
-  </div>
 
     <main data-bs-spy="scroll" data-bs-target="#navbar-example2" data-bs-root-margin="0px 0px -40%"
         data-bs-smooth-scroll="true" class="scrollspy-example bg-body-tertiary p-3 rounded-2" tabindex="0">
 
-        <div class="div d-flex justify-content-center my-5"><h5>Products Based on the category : <%= data[0].category.name %> %></h5></div>
+        <div class="div d-flex justify-content-center my-5">
+            <h5>Products Based on the category : <%= data[0].category.name %> %></h5>
+        </div>
 
         <div class="container" id="scrollspyHeading1">
             <% data.forEach(product=>{ %>
-            <div class="row p-3 w-100" style="height: 400px;">
-                <div class="col-8">
-                    <div class="card mb-3 h-100" style="max-width: auto;">
-                        <div class="row g-0">
-                            <div class="col-md-4">
-                                <img src="/<%= product.images[0] %>" class="img-fluid rounded-start" alt="...">
-                            </div>
-                            <div class="col-md-8">
-                                <div class="card-body">
-                                    <h5 class="card-title"><%= product.name %></h5>
-                                    <p class="card-text">Description : <%= product.description %></p>
+                <div class="row p-3 w-100" style="height: 400px;">
+                    <div class="col-8">
+                        <div class="card mb-3 h-100" style="max-width: auto;">
+                            <div class="row g-0">
+                                <div class="col-md-4">
+                                    <img src="/<%= product.images[0] %>" class="img-fluid rounded-start" alt="...">
                                 </div>
-                                <ul class="list-group list-group-flush">
-                                    <li class="list-group-item">Category : <%= product.category.name %></li>
-                                    <li class="list-group-item">Rating : <%= product.rating %></li>
-                                </ul>
-                                <div class="card-body">
-                                    <button type="button" class="btn btn-outline-warning">Add to cart</button>
-                                    <a href="/user/productDetailed/<%= product._id %>"><button type="button" class="btn btn-outline-info">View Details</button></a>
+                                <div class="col-md-8">
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            <%= product.name %>
+                                        </h5>
+                                        <p class="card-text">Description : <%= product.description %>
+                                        </p>
+                                    </div>
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item">Category : <%= product.category.name %>
+                                        </li>
+                                        <li class="list-group-item">Rating : <%= product.rating %>
+                                        </li>
+                                    </ul>
+                                    <div class="card-body">
+                                        <button type="button" class="btn btn-outline-warning addtocart"
+                                            onclick="addToCart()" data-id="<%= product._id %>">Add to cart</button>
+                                        <a href="/user/productDetailed/<%= product._id %>"><button type="button"
+                                                class="btn btn-outline-info">View Details</button></a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                </div>
-                <div class="col-4">
-                    <div class="card border-dark mb-3 h-100">
-                        <div class="card-header"><h3>Rs. <%= product.rate %></h3></div>
-                        <div class="card-body">
-                            <h5 class="card-title">Rating : <%= product.rating %></h5>
-                            <p class="card-text">Some quick example text to build on the card title and make up the bulk
-                                of the card's content.</p>
+                    </div>
+                    <div class="col-4">
+                        <div class="card border-dark mb-3 h-100">
+                            <div class="card-header">
+                                <h3>Rs. <%= product.rate %>
+                                </h3>
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title">Rating : <%= product.rating %>
+                                </h5>
+                                <p class="card-text">Some quick example text to build on the card title and make up the
+                                    bulk
+                                    of the card's content.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        <% }) %>
+                <% }) %>
         </div>
-        
+
         <!-- pokki adi -->
 
         <div class="container my-5">
@@ -89,10 +104,56 @@
         </div>
 
         <%- include('../partials/footer') %>
-        
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-        crossorigin="anonymous"></script>
-</body>
 
-</html>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+                integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+                crossorigin="anonymous"></script>
+            <script>
+                const addtocartButton = document.querySelector('.addtocart')
+                const productId = addtocartButton.getAttribute('data-id')
+
+                async function addToCart() {
+                    try {
+                        const response = await fetch(`/user/addToCart?quantity`, {
+                            method: "POST", headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ id: productId })
+                        })
+
+                        const data = await response.json();
+
+                        if (data.message === "success") {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Product Added!',
+                                text: 'The product has been added to your cart.'
+                            });
+                        } else if (data.message === "excess") {
+                            Swal.fire({
+                                icon: 'Only 5 quantity allowed, 5 quantity is in cart',
+                                title: 'Quantity Limit Reached',
+                                text: 'You have reached the maximum quantity for this product.'
+                            });
+                        } else {
+                            // Handle other potential error messages from the server
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: data.message || 'An error occurred while adding the product to your cart.'
+                            });
+                        }
+                    } catch (error) {
+                        console.error('Fetch Error:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'An error occurred while processing your request.'
+                        })
+                    }
+                }
+
+            </script>
+            </body>
+
+            </html>
